@@ -1,0 +1,2156 @@
+{
+    "$schema": "paktlang://schema/module/v1",
+    "$id": "paktlang://modules/satin_alma/v1",
+    "module": "satin_alma",
+    "version": "1.1.0",
+    "description": "Satın alma yönetimi modülü",
+    "dependencies": [
+        "cari",
+        "stok",
+        "finans"
+    ],
+    "priority": "high",
+    "tables": [
+        {
+            "pl_table": "satin_alma_talep",
+            "description": "Satın alma talepleri",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "talep_no",
+                    "type": "document_number",
+                    "unique": true,
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "talep_tarihi",
+                    "type": "date",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "talep_eden",
+                    "type": "string",
+                    "max_length": 150,
+                    "required": true
+                },
+                {
+                    "name": "departman",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "talep_tipi",
+                    "type": "enum",
+                    "values": [
+                        "stok",
+                        "hizmet",
+                        "sabit_kiymet",
+                        "sarf_malzeme",
+                        "diger"
+                    ],
+                    "default": "stok"
+                },
+                {
+                    "name": "oncelik",
+                    "type": "enum",
+                    "values": [
+                        "dusuk",
+                        "normal",
+                        "yuksek",
+                        "acil"
+                    ],
+                    "default": "normal"
+                },
+                {
+                    "name": "ihtiyac_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "proje_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "maliyet_merkezi_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "tahmini_butce",
+                    "type": "currency"
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "taslak",
+                        "onay_bekliyor",
+                        "onaylandi",
+                        "reddedildi",
+                        "siparise_dondu",
+                        "iptal"
+                    ],
+                    "default": "taslak",
+                    "indexed": true
+                },
+                {
+                    "name": "onay_1_kullanici",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "onay_1_tarihi",
+                    "type": "datetime"
+                },
+                {
+                    "name": "onay_2_kullanici",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "onay_2_tarihi",
+                    "type": "datetime"
+                },
+                {
+                    "name": "red_nedeni",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                },
+                {
+                    "name": "olusturma_tarihi",
+                    "type": "datetime",
+                    "auto_now_add": true
+                }
+            ]
+        },
+        {
+            "pl_table": "satin_alma_talep_kalem",
+            "description": "Talep kalemleri",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "talep_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "satin_alma_talep",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "satir_no",
+                    "type": "integer",
+                    "required": true
+                },
+                {
+                    "name": "stok_id",
+                    "type": "bigint",
+                    "indexed": true
+                },
+                {
+                    "name": "urun_adi",
+                    "type": "string",
+                    "max_length": 300,
+                    "required": true
+                },
+                {
+                    "name": "urun_aciklama",
+                    "type": "text"
+                },
+                {
+                    "name": "miktar",
+                    "type": "quantity",
+                    "required": true
+                },
+                {
+                    "name": "birim",
+                    "type": "string",
+                    "max_length": 20
+                },
+                {
+                    "name": "tahmini_fiyat",
+                    "type": "unit_price"
+                },
+                {
+                    "name": "onerilen_tedarikci",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "beklemede",
+                        "onaylandi",
+                        "reddedildi",
+                        "siparise_eklendi"
+                    ],
+                    "default": "beklemede"
+                }
+            ]
+        },
+        {
+            "pl_table": "tedarikci_teklif_talebi",
+            "description": "Tedarikçilerden teklif istekleri (RFQ)",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "rfq_no",
+                    "type": "document_number",
+                    "unique": true,
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "rfq_tarihi",
+                    "type": "date",
+                    "required": true
+                },
+                {
+                    "name": "son_teklif_tarihi",
+                    "type": "date",
+                    "required": true
+                },
+                {
+                    "name": "talep_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "satin_alma_talep",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "konu",
+                    "type": "string",
+                    "max_length": 300,
+                    "required": true
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "teslim_yeri",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "teslim_kosulu",
+                    "type": "enum",
+                    "values": [
+                        "exw",
+                        "fob",
+                        "cif",
+                        "dap",
+                        "ddp",
+                        "diger"
+                    ]
+                },
+                {
+                    "name": "odeme_kosulu",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "ozel_sartlar",
+                    "type": "text"
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "taslak",
+                        "gonderildi",
+                        "teklifler_alindi",
+                        "degerlendiriliyor",
+                        "karar_verildi",
+                        "iptal"
+                    ],
+                    "default": "taslak"
+                },
+                {
+                    "name": "secilen_tedarikci_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "kararlastirma_notu",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "pl_table": "rfq_tedarikci",
+            "description": "RFQ gönderilen tedarikçiler",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "rfq_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "tedarikci_teklif_talebi",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "tedarikci_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "gonderim_tarihi",
+                    "type": "datetime"
+                },
+                {
+                    "name": "gonderim_yontemi",
+                    "type": "enum",
+                    "values": [
+                        "email",
+                        "portal",
+                        "fax",
+                        "elden"
+                    ],
+                    "default": "email"
+                },
+                {
+                    "name": "teklif_alindi",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "teklif_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "toplam_tutar",
+                    "type": "currency"
+                },
+                {
+                    "name": "teslim_suresi_gun",
+                    "type": "integer"
+                },
+                {
+                    "name": "degerlendirme_puani",
+                    "type": "integer",
+                    "min": 0,
+                    "max": 100
+                },
+                {
+                    "name": "notlar",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "pl_table": "rfq_kalem",
+            "description": "RFQ kalemleri",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "rfq_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "tedarikci_teklif_talebi",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "satir_no",
+                    "type": "integer",
+                    "required": true
+                },
+                {
+                    "name": "talep_kalem_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "stok_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "urun_adi",
+                    "type": "string",
+                    "max_length": 300,
+                    "required": true
+                },
+                {
+                    "name": "urun_aciklama",
+                    "type": "text"
+                },
+                {
+                    "name": "miktar",
+                    "type": "quantity",
+                    "required": true
+                },
+                {
+                    "name": "birim",
+                    "type": "string",
+                    "max_length": 20
+                }
+            ]
+        },
+        {
+            "pl_table": "tedarikci_teklif",
+            "description": "Tedarikçi teklifleri",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "teklif_no",
+                    "type": "document_number",
+                    "indexed": true
+                },
+                {
+                    "name": "rfq_tedarikci_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "rfq_tedarikci",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "tedarikci_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "teklif_tarihi",
+                    "type": "date",
+                    "required": true
+                },
+                {
+                    "name": "gecerlilik_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "doviz_kuru",
+                    "type": "exchange_rate",
+                    "default": 1
+                },
+                {
+                    "name": "ara_toplam",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "iskonto_tutari",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "kdv_toplam",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "genel_toplam",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "teslim_suresi_gun",
+                    "type": "integer"
+                },
+                {
+                    "name": "odeme_vadesi_gun",
+                    "type": "integer"
+                },
+                {
+                    "name": "teslim_kosulu",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "alindi",
+                        "degerlendiriliyor",
+                        "kabul_edildi",
+                        "kismen_kabul",
+                        "reddedildi"
+                    ],
+                    "default": "alindi"
+                },
+                {
+                    "name": "degerlendirme_notu",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "pl_table": "tedarikci_teklif_kalem",
+            "description": "Tedarikçi teklif kalemleri",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "teklif_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "tedarikci_teklif",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "rfq_kalem_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "rfq_kalem",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "satir_no",
+                    "type": "integer",
+                    "required": true
+                },
+                {
+                    "name": "stok_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "urun_adi",
+                    "type": "string",
+                    "max_length": 300,
+                    "required": true
+                },
+                {
+                    "name": "miktar",
+                    "type": "quantity",
+                    "required": true
+                },
+                {
+                    "name": "birim",
+                    "type": "string",
+                    "max_length": 20
+                },
+                {
+                    "name": "birim_fiyat",
+                    "type": "unit_price",
+                    "required": true
+                },
+                {
+                    "name": "iskonto_orani",
+                    "type": "discount_rate",
+                    "default": 0
+                },
+                {
+                    "name": "kdv_orani",
+                    "type": "tax_rate",
+                    "default": 20
+                },
+                {
+                    "name": "toplam_tutar",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "teslim_suresi",
+                    "type": "integer"
+                },
+                {
+                    "name": "kabul_edildi",
+                    "type": "boolean",
+                    "default": false
+                }
+            ]
+        },
+        {
+            "pl_table": "satin_alma_siparis",
+            "description": "Satın alma siparişleri",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "siparis_no",
+                    "type": "document_number",
+                    "unique": true,
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "siparis_tarihi",
+                    "type": "date",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "tedarikci_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "tedarikci_ref_no",
+                    "type": "string",
+                    "max_length": 50,
+                    "description": "Tedarikçi sipariş referansı"
+                },
+                {
+                    "name": "talep_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "satin_alma_talep",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "teklif_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "tedarikci_teklif",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "siparis_tipi",
+                    "type": "enum",
+                    "values": [
+                        "standart",
+                        "acil",
+                        "cerceve",
+                        "konsiye",
+                        "numune"
+                    ],
+                    "default": "standart"
+                },
+                {
+                    "name": "teslim_tarihi",
+                    "type": "date",
+                    "indexed": true
+                },
+                {
+                    "name": "depo_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "teslim_adresi",
+                    "type": "text"
+                },
+                {
+                    "name": "alici_id",
+                    "type": "bigint",
+                    "description": "Satın alma sorumlusu"
+                },
+                {
+                    "name": "proje_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "maliyet_merkezi_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "doviz_kuru",
+                    "type": "exchange_rate",
+                    "default": 1
+                },
+                {
+                    "name": "vade_gunu",
+                    "type": "integer",
+                    "default": 30
+                },
+                {
+                    "name": "odeme_sekli",
+                    "type": "enum",
+                    "values": [
+                        "nakit",
+                        "havale",
+                        "cek",
+                        "senet",
+                        "acik_hesap"
+                    ]
+                },
+                {
+                    "name": "teslim_kosulu",
+                    "type": "enum",
+                    "values": [
+                        "exw",
+                        "fob",
+                        "cif",
+                        "dap",
+                        "ddp",
+                        "fabrika_teslim",
+                        "depo_teslim"
+                    ]
+                },
+                {
+                    "name": "ara_toplam",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "iskonto_tutari",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "kdv_toplam",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "otv_toplam",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "nakliye_ucreti",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "diger_masraflar",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "genel_toplam",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "taslak",
+                        "onay_bekliyor",
+                        "onaylandi",
+                        "gonderildi",
+                        "kismen_teslim",
+                        "tamamlandi",
+                        "faturalandi",
+                        "iptal"
+                    ],
+                    "default": "taslak",
+                    "indexed": true
+                },
+                {
+                    "name": "onay_1_kullanici",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "onay_1_tarihi",
+                    "type": "datetime"
+                },
+                {
+                    "name": "onay_2_kullanici",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "onay_2_tarihi",
+                    "type": "datetime"
+                },
+                {
+                    "name": "iptal_nedeni",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "notlar",
+                    "type": "text"
+                },
+                {
+                    "name": "olusturma_tarihi",
+                    "type": "datetime",
+                    "auto_now_add": true
+                }
+            ],
+            "indexes": [
+                {
+                    "name": "idx_siparis_tedarikci",
+                    "columns": [
+                        "tedarikci_id"
+                    ]
+                },
+                {
+                    "name": "idx_siparis_tarih",
+                    "columns": [
+                        "siparis_tarihi"
+                    ]
+                },
+                {
+                    "name": "idx_siparis_durum",
+                    "columns": [
+                        "durum"
+                    ]
+                }
+            ]
+        },
+        {
+            "pl_table": "satin_alma_siparis_kalem",
+            "description": "Sipariş kalemleri",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "siparis_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "satin_alma_siparis",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "satir_no",
+                    "type": "integer",
+                    "required": true
+                },
+                {
+                    "name": "talep_kalem_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "teklif_kalem_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "stok_id",
+                    "type": "bigint",
+                    "indexed": true
+                },
+                {
+                    "name": "stok_kodu",
+                    "type": "erp_code"
+                },
+                {
+                    "name": "stok_adi",
+                    "type": "string",
+                    "max_length": 300
+                },
+                {
+                    "name": "miktar",
+                    "type": "quantity",
+                    "required": true
+                },
+                {
+                    "name": "birim_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "teslim_miktari",
+                    "type": "quantity",
+                    "default": 0
+                },
+                {
+                    "name": "iptal_miktari",
+                    "type": "quantity",
+                    "default": 0
+                },
+                {
+                    "name": "faturalanan",
+                    "type": "quantity",
+                    "default": 0
+                },
+                {
+                    "name": "depo_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "birim_fiyat",
+                    "type": "unit_price",
+                    "required": true
+                },
+                {
+                    "name": "iskonto_orani",
+                    "type": "discount_rate",
+                    "default": 0
+                },
+                {
+                    "name": "kdv_orani",
+                    "type": "tax_rate",
+                    "default": 20
+                },
+                {
+                    "name": "otv_orani",
+                    "type": "tax_rate",
+                    "default": 0
+                },
+                {
+                    "name": "toplam_tutar",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "teslim_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "beklemede",
+                        "onaylandi",
+                        "siparis_verildi",
+                        "kismen_teslim",
+                        "tamamlandi",
+                        "iptal"
+                    ],
+                    "default": "beklemede"
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "pl_table": "satin_alma_irsaliye",
+            "description": "Alış irsaliyeleri",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "irsaliye_no",
+                    "type": "document_number",
+                    "unique": true,
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "irsaliye_tarihi",
+                    "type": "date",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "tedarikci_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "tedarikci_irsaliye_no",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "siparis_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "satin_alma_siparis",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "depo_id",
+                    "type": "bigint",
+                    "required": true
+                },
+                {
+                    "name": "alici_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "tasiyici_firma",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "tasiyici_plaka",
+                    "type": "string",
+                    "max_length": 20
+                },
+                {
+                    "name": "sevk_irsaliye_no",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "toplam_paket",
+                    "type": "integer"
+                },
+                {
+                    "name": "toplam_agirlik",
+                    "type": "decimal",
+                    "precision": 12,
+                    "scale": 3
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "beklemede",
+                        "teslim_alindi",
+                        "kalite_kontrolde",
+                        "kabul_edildi",
+                        "kismen_kabul",
+                        "reddedildi",
+                        "faturalandi"
+                    ],
+                    "default": "beklemede"
+                },
+                {
+                    "name": "kalite_kontrol_notu",
+                    "type": "text"
+                },
+                {
+                    "name": "faturalandi",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "fatura_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "pl_table": "satin_alma_irsaliye_kalem",
+            "description": "İrsaliye kalemleri",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "irsaliye_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "satin_alma_irsaliye",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "satir_no",
+                    "type": "integer",
+                    "required": true
+                },
+                {
+                    "name": "siparis_kalem_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "satin_alma_siparis_kalem",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "stok_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "depo_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "lokasyon_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "miktar",
+                    "type": "quantity",
+                    "required": true
+                },
+                {
+                    "name": "birim_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "kabul_miktar",
+                    "type": "quantity",
+                    "default": 0
+                },
+                {
+                    "name": "red_miktar",
+                    "type": "quantity",
+                    "default": 0
+                },
+                {
+                    "name": "lot_no",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "seri_no",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "uretim_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "son_kullanma_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "faturalanan",
+                    "type": "quantity",
+                    "default": 0
+                },
+                {
+                    "name": "birim_fiyat",
+                    "type": "unit_price"
+                },
+                {
+                    "name": "kalite_durum",
+                    "type": "enum",
+                    "values": [
+                        "beklemede",
+                        "kabul",
+                        "red",
+                        "karantina"
+                    ]
+                },
+                {
+                    "name": "red_nedeni",
+                    "type": "string",
+                    "max_length": 200
+                }
+            ]
+        },
+        {
+            "pl_table": "satin_alma_fatura",
+            "description": "Alış faturaları",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "fatura_no",
+                    "type": "document_number",
+                    "indexed": true
+                },
+                {
+                    "name": "tedarikci_fatura_no",
+                    "type": "string",
+                    "max_length": 50,
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "fatura_tarihi",
+                    "type": "date",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "fatura_tipi",
+                    "type": "enum",
+                    "values": [
+                        "standart",
+                        "iade",
+                        "masraf",
+                        "hizmet",
+                        "ithalat"
+                    ],
+                    "default": "standart"
+                },
+                {
+                    "name": "tedarikci_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "tedarikci_unvan",
+                    "type": "string",
+                    "max_length": 300
+                },
+                {
+                    "name": "tedarikci_vergi_no",
+                    "type": "tax_number"
+                },
+                {
+                    "name": "siparis_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "satin_alma_siparis",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "depo_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "vade_tarihi",
+                    "type": "date",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "doviz_kuru",
+                    "type": "exchange_rate",
+                    "default": 1
+                },
+                {
+                    "name": "ara_toplam",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "iskonto_toplam",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "matrah",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "kdv_1",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "kdv_10",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "kdv_20",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "kdv_toplam",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "otv_toplam",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "tevkifat_matrah",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "tevkifat_toplam",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "stopaj_toplam",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "nakliye_ucreti",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "genel_toplam",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "odenen",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "kalan_tutar",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "taslak",
+                        "kaydedildi",
+                        "onaylandi",
+                        "kismen_odendi",
+                        "odendi",
+                        "iptal"
+                    ],
+                    "default": "taslak"
+                },
+                {
+                    "name": "e_fatura",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "e_fatura_ettn",
+                    "type": "uuid"
+                },
+                {
+                    "name": "proje_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "maliyet_merkezi_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                },
+                {
+                    "name": "olusturma_tarihi",
+                    "type": "datetime",
+                    "auto_now_add": true
+                }
+            ]
+        },
+        {
+            "pl_table": "satin_alma_fatura_kalem",
+            "description": "Fatura kalemleri",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "fatura_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "satin_alma_fatura",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "satir_no",
+                    "type": "integer",
+                    "required": true
+                },
+                {
+                    "name": "irsaliye_kalem_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "stok_id",
+                    "type": "bigint",
+                    "indexed": true
+                },
+                {
+                    "name": "stok_kodu",
+                    "type": "erp_code"
+                },
+                {
+                    "name": "stok_adi",
+                    "type": "string",
+                    "max_length": 300,
+                    "required": true
+                },
+                {
+                    "name": "miktar",
+                    "type": "quantity",
+                    "required": true
+                },
+                {
+                    "name": "birim_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "birim_fiyat",
+                    "type": "unit_price",
+                    "required": true
+                },
+                {
+                    "name": "iskonto_orani_1",
+                    "type": "discount_rate",
+                    "default": 0
+                },
+                {
+                    "name": "iskonto_orani_2",
+                    "type": "discount_rate",
+                    "default": 0
+                },
+                {
+                    "name": "iskonto_tutari",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "net_tutar",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "kdv_orani",
+                    "type": "tax_rate",
+                    "default": 20
+                },
+                {
+                    "name": "kdv_tutari",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "otv_orani",
+                    "type": "tax_rate",
+                    "default": 0
+                },
+                {
+                    "name": "otv_tutari",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "tevkifat_kodu",
+                    "type": "string",
+                    "max_length": 10
+                },
+                {
+                    "name": "tevkifat_orani",
+                    "type": "percentage",
+                    "default": 0
+                },
+                {
+                    "name": "toplam_tutar",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "depo_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "lot_no",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "proje_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "maliyet_merkezi_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "pl_table": "satin_alma_iade",
+            "description": "Satın alma iade işlemleri",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "iade_no",
+                    "type": "document_number",
+                    "unique": true,
+                    "required": true
+                },
+                {
+                    "name": "iade_tarihi",
+                    "type": "date",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "tedarikci_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "fatura_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "satin_alma_fatura",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "iade_sebebi",
+                    "type": "enum",
+                    "values": [
+                        "hasarli",
+                        "yanlis_urun",
+                        "miktar_hatasi",
+                        "kalite",
+                        "suresi_gecmis",
+                        "garanti",
+                        "diger"
+                    ],
+                    "required": true
+                },
+                {
+                    "name": "depo_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "toplam_tutar",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "taslak",
+                        "gonderildi",
+                        "tedarikci_onay",
+                        "tamamlandi"
+                    ],
+                    "default": "taslak"
+                },
+                {
+                    "name": "iade_fatura_no",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "pl_table": "satin_alma_iade_kalem",
+            "description": "İade kalemleri",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "iade_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "satin_alma_iade",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "fatura_kalem_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "stok_id",
+                    "type": "bigint",
+                    "required": true
+                },
+                {
+                    "name": "miktar",
+                    "type": "quantity",
+                    "required": true
+                },
+                {
+                    "name": "birim_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "birim_fiyat",
+                    "type": "unit_price"
+                },
+                {
+                    "name": "iade_tutar",
+                    "type": "currency"
+                },
+                {
+                    "name": "lot_no",
+                    "type": "string",
+                    "max_length": 50
+                }
+            ]
+        },
+        {
+            "pl_table": "tedarikci_degerlendirme",
+            "description": "Tedarikçi performans değerlendirmeleri",
+            "is_master": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "tedarikci_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "degerlendirme_donemi",
+                    "type": "string",
+                    "max_length": 10,
+                    "required": true,
+                    "description": "YYYY-Q# formatı"
+                },
+                {
+                    "name": "kalite_puani",
+                    "type": "integer",
+                    "min": 0,
+                    "max": 100
+                },
+                {
+                    "name": "teslimat_puani",
+                    "type": "integer",
+                    "min": 0,
+                    "max": 100
+                },
+                {
+                    "name": "fiyat_puani",
+                    "type": "integer",
+                    "min": 0,
+                    "max": 100
+                },
+                {
+                    "name": "iletisim_puani",
+                    "type": "integer",
+                    "min": 0,
+                    "max": 100
+                },
+                {
+                    "name": "genel_puan",
+                    "type": "integer",
+                    "min": 0,
+                    "max": 100
+                },
+                {
+                    "name": "not",
+                    "type": "text"
+                },
+                {
+                    "name": "degerlendiren",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "degerlendirme_tarihi",
+                    "type": "date"
+                }
+            ],
+            "indexes": [
+                {
+                    "name": "idx_degerlendirme_tedarikci",
+                    "columns": [
+                        "tedarikci_id",
+                        "degerlendirme_donemi"
+                    ],
+                    "unique": true
+                }
+            ]
+        },
+        {
+            "pl_table": "tedarikci_sozlesme",
+            "description": "Tedarikçi sözleşmeleri",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "sozlesme_no",
+                    "type": "document_number",
+                    "unique": true,
+                    "required": true
+                },
+                {
+                    "name": "tedarikci_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "sozlesme_tipi",
+                    "type": "enum",
+                    "values": [
+                        "cerceve",
+                        "yillik",
+                        "proje",
+                        "ozel"
+                    ],
+                    "default": "cerceve"
+                },
+                {
+                    "name": "baslangic_tarihi",
+                    "type": "date",
+                    "required": true
+                },
+                {
+                    "name": "bitis_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "min_alis_tutari",
+                    "type": "currency"
+                },
+                {
+                    "name": "max_alis_tutari",
+                    "type": "currency"
+                },
+                {
+                    "name": "iskonto_orani",
+                    "type": "discount_rate"
+                },
+                {
+                    "name": "vade_gunu",
+                    "type": "integer"
+                },
+                {
+                    "name": "teslim_kosulu",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "ozel_sartlar",
+                    "type": "text"
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "taslak",
+                        "aktif",
+                        "askida",
+                        "sona_erdi",
+                        "iptal"
+                    ],
+                    "default": "taslak"
+                },
+                {
+                    "name": "dosya_yolu",
+                    "type": "string",
+                    "max_length": 500
+                }
+            ]
+        },
+        {
+            "pl_table": "ithalat_beyani",
+            "description": "İthalat beyanname kayıtları",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "beyan_no",
+                    "type": "document_number",
+                    "unique": true,
+                    "required": true
+                },
+                {
+                    "name": "beyan_tarihi",
+                    "type": "date",
+                    "required": true
+                },
+                {
+                    "name": "gumruk_idaresi",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "tedarikci_id",
+                    "type": "bigint",
+                    "indexed": true
+                },
+                {
+                    "name": "mensei_ulke",
+                    "type": "country_code"
+                },
+                {
+                    "name": "cikis_ulke",
+                    "type": "country_code"
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code"
+                },
+                {
+                    "name": "doviz_kuru",
+                    "type": "exchange_rate"
+                },
+                {
+                    "name": "fob_deger",
+                    "type": "currency"
+                },
+                {
+                    "name": "cif_deger",
+                    "type": "currency"
+                },
+                {
+                    "name": "gumruk_vergisi",
+                    "type": "currency"
+                },
+                {
+                    "name": "kdv",
+                    "type": "currency"
+                },
+                {
+                    "name": "otv",
+                    "type": "currency"
+                },
+                {
+                    "name": "diger_vergiler",
+                    "type": "currency"
+                },
+                {
+                    "name": "toplam_maliyet",
+                    "type": "currency"
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "beklemede",
+                        "gumrukte",
+                        "tamamlandi"
+                    ],
+                    "default": "beklemede"
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                }
+            ]
+        }
+    ],
+    "views": [
+        {
+            "name": "acik_siparisler",
+            "description": "Açık satın alma siparişleri",
+            "base_tables": [
+                "satin_alma_siparis",
+                "satin_alma_siparis_kalem"
+            ],
+            "columns": [
+                {
+                    "name": "siparis_no",
+                    "source": "siparis_no"
+                },
+                {
+                    "name": "tedarikci",
+                    "source": "tedarikci_unvan"
+                },
+                {
+                    "name": "siparis_tarihi",
+                    "source": "siparis_tarihi"
+                },
+                {
+                    "name": "bekleyen_miktar",
+                    "computed": "miktar - teslim_miktari"
+                },
+                {
+                    "name": "bekleyen_tutar",
+                    "computed": "bekleyen * fiyat"
+                },
+                {
+                    "name": "teslim_tarihi",
+                    "source": "teslim_tarihi"
+                },
+                {
+                    "name": "gecikme_gun",
+                    "computed": "BUGUN - teslim_tarihi"
+                }
+            ]
+        },
+        {
+            "name": "tedarikci_performans",
+            "description": "Tedarikçi performans özeti",
+            "base_tables": [
+                "tedarikci_degerlendirme",
+                "satin_alma_siparis",
+                "satin_alma_irsaliye"
+            ],
+            "columns": [
+                {
+                    "name": "tedarikci_id",
+                    "source": "tedarikci_id"
+                },
+                {
+                    "name": "tedarikci_adi",
+                    "source": "cari_kart.unvan"
+                },
+                {
+                    "name": "toplam_siparis",
+                    "aggregation": "COUNT(siparis)"
+                },
+                {
+                    "name": "toplam_tutar",
+                    "aggregation": "SUM(fatura_toplam)"
+                },
+                {
+                    "name": "ortalama_teslimat_gun",
+                    "aggregation": "AVG(teslim_gun)"
+                },
+                {
+                    "name": "zamaninda_teslimat_oran",
+                    "computed": "Zamanında teslimat yüzdesi"
+                },
+                {
+                    "name": "red_orani",
+                    "computed": "Red miktarı / Toplam miktar"
+                },
+                {
+                    "name": "genel_puan",
+                    "source": "tedarikci_degerlendirme.genel_puan"
+                }
+            ]
+        },
+        {
+            "name": "vadesi_gelen_odemeler",
+            "description": "Vadesi yaklaşan tedarikçi ödemeleri",
+            "base_tables": [
+                "satin_alma_fatura"
+            ],
+            "columns": [
+                {
+                    "name": "fatura_no",
+                    "source": "tedarikci_fatura_no"
+                },
+                {
+                    "name": "tedarikci",
+                    "source": "tedarikci_unvan"
+                },
+                {
+                    "name": "vade_tarihi",
+                    "source": "vade_tarihi"
+                },
+                {
+                    "name": "kalan_tutar",
+                    "source": "kalan_tutar"
+                },
+                {
+                    "name": "kalan_gun",
+                    "computed": "vade_tarihi - BUGUN"
+                }
+            ]
+        },
+        {
+            "name": "alis_analiz",
+            "description": "Dönemsel alış analizi",
+            "base_tables": [
+                "satin_alma_fatura"
+            ],
+            "columns": [
+                {
+                    "name": "ay",
+                    "computed": "Yıl-Ay"
+                },
+                {
+                    "name": "fatura_adedi",
+                    "aggregation": "COUNT(*)"
+                },
+                {
+                    "name": "toplam_tutar",
+                    "aggregation": "SUM(genel_toplam)"
+                },
+                {
+                    "name": "tedarikci_sayisi",
+                    "aggregation": "COUNT(DISTINCT tedarikci)"
+                }
+            ]
+        },
+        {
+            "name": "stok_tedarik_analiz",
+            "description": "Ürün bazlı tedarik analizi",
+            "base_tables": [
+                "satin_alma_fatura_kalem",
+                "stok_kart"
+            ],
+            "columns": [
+                {
+                    "name": "stok_kodu",
+                    "source": "stok_kodu"
+                },
+                {
+                    "name": "stok_adi",
+                    "source": "stok_adi"
+                },
+                {
+                    "name": "tedarikci_sayisi",
+                    "aggregation": "COUNT(DISTINCT tedarikci)"
+                },
+                {
+                    "name": "toplam_miktar",
+                    "aggregation": "SUM(miktar)"
+                },
+                {
+                    "name": "ortalama_fiyat",
+                    "aggregation": "AVG(birim_fiyat)"
+                },
+                {
+                    "name": "min_fiyat",
+                    "aggregation": "MIN(birim_fiyat)"
+                },
+                {
+                    "name": "max_fiyat",
+                    "aggregation": "MAX(birim_fiyat)"
+                }
+            ]
+        }
+    ],
+    "business_rules": [
+        {
+            "code": "SA001",
+            "type": "validation",
+            "description": "Sipariş onayı için tutar/limit kontrolü"
+        },
+        {
+            "code": "SA002",
+            "type": "validation",
+            "description": "Çoklu onay mekanizması aktif"
+        },
+        {
+            "code": "SA003",
+            "type": "warning",
+            "description": "Tercihli tedarikçi dışında alım yapılıyor"
+        },
+        {
+            "code": "SA004",
+            "type": "validation",
+            "description": "İrsaliye miktarı sipariş miktarını aşamaz"
+        },
+        {
+            "code": "SA005",
+            "type": "warning",
+            "description": "Fatura tutarı sipariş tutarından farklı"
+        },
+        {
+            "code": "SA006",
+            "type": "info",
+            "description": "Tedarikçi değerlendirme hatırlatması"
+        },
+        {
+            "code": "SA007",
+            "type": "validation",
+            "description": "Bütçe kontrolü - maliyet merkezi limiti"
+        }
+    ]
+}

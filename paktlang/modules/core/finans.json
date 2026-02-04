@@ -1,0 +1,2107 @@
+{
+    "$schema": "paktlang://schema/module/v1",
+    "$id": "paktlang://modules/finans/v1",
+    "module": "finans",
+    "version": "1.1.0",
+    "description": "Kasa, banka ve çek/senet yönetimi modülü",
+    "dependencies": [
+        "cari"
+    ],
+    "priority": "high",
+    "tables": [
+        {
+            "pl_table": "kasa",
+            "description": "Kasa tanımları",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "kasa_kodu",
+                    "type": "erp_code",
+                    "unique": true,
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "kasa_adi",
+                    "type": "string",
+                    "max_length": 100,
+                    "required": true
+                },
+                {
+                    "name": "kasa_tipi",
+                    "type": "enum",
+                    "values": [
+                        "ana_kasa",
+                        "sube_kasa",
+                        "pos_kasa",
+                        "tahsilat_kasa",
+                        "doviz_kasa"
+                    ],
+                    "default": "ana_kasa"
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "required": true,
+                    "default": "TRY"
+                },
+                {
+                    "name": "acilis_bakiye",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "kasa_limiti",
+                    "type": "currency",
+                    "description": "Maksimum kasa tutarı"
+                },
+                {
+                    "name": "yetkili_kullanici",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "sube_kodu",
+                    "type": "string",
+                    "max_length": 20
+                },
+                {
+                    "name": "muhasebe_hesap_kodu",
+                    "type": "account_code"
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                },
+                {
+                    "name": "aktif",
+                    "type": "boolean",
+                    "default": true
+                }
+            ]
+        },
+        {
+            "pl_table": "kasa_hareket",
+            "description": "Kasa giriş/çıkış hareketleri",
+            "is_master": false,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "kasa_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "kasa",
+                        "column": "id",
+                        "on_delete": "RESTRICT"
+                    }
+                },
+                {
+                    "name": "hareket_no",
+                    "type": "document_number",
+                    "indexed": true
+                },
+                {
+                    "name": "hareket_tarihi",
+                    "type": "date",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "islem_zamani",
+                    "type": "datetime",
+                    "auto_now_add": true
+                },
+                {
+                    "name": "hareket_tipi",
+                    "type": "enum",
+                    "values": [
+                        "giris",
+                        "cikis"
+                    ],
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "hareket_turu",
+                    "type": "enum",
+                    "values": [
+                        "tahsilat",
+                        "odeme",
+                        "banka_yatirma",
+                        "banka_cekme",
+                        "kasalar_arasi",
+                        "faiz",
+                        "masraf",
+                        "acilis",
+                        "kapalis",
+                        "diger"
+                    ],
+                    "required": true
+                },
+                {
+                    "name": "tutar",
+                    "type": "currency",
+                    "required": true
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "doviz_kuru",
+                    "type": "exchange_rate",
+                    "default": 1
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "indexed": true,
+                    "description": "İlgili cari hesap"
+                },
+                {
+                    "name": "odeme_sekli",
+                    "type": "enum",
+                    "values": [
+                        "nakit",
+                        "kredi_karti",
+                        "cek",
+                        "senet",
+                        "diger"
+                    ],
+                    "default": "nakit"
+                },
+                {
+                    "name": "belge_no",
+                    "type": "document_number"
+                },
+                {
+                    "name": "belge_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "fis_no",
+                    "type": "string",
+                    "max_length": 50,
+                    "indexed": true
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                },
+                {
+                    "name": "karsi_kasa_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "kasa",
+                        "column": "id"
+                    },
+                    "description": "Kasalar arası transfer için"
+                },
+                {
+                    "name": "banka_hesap_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "banka_hesap",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "kaynak_modul",
+                    "type": "enum",
+                    "values": [
+                        "satis",
+                        "satin_alma",
+                        "finans",
+                        "manuel"
+                    ]
+                },
+                {
+                    "name": "kaynak_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "onay_durumu",
+                    "type": "enum",
+                    "values": [
+                        "beklemede",
+                        "onaylandi",
+                        "reddedildi"
+                    ],
+                    "default": "onaylandi"
+                },
+                {
+                    "name": "onaylayan",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "iptal",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "iptal_nedeni",
+                    "type": "string",
+                    "max_length": 200
+                }
+            ],
+            "indexes": [
+                {
+                    "name": "idx_kasa_hareket_tarih",
+                    "columns": [
+                        "kasa_id",
+                        "hareket_tarihi"
+                    ]
+                },
+                {
+                    "name": "idx_kasa_hareket_cari",
+                    "columns": [
+                        "cari_id"
+                    ]
+                },
+                {
+                    "name": "idx_kasa_hareket_fis",
+                    "columns": [
+                        "fis_no"
+                    ]
+                }
+            ]
+        },
+        {
+            "pl_table": "banka",
+            "description": "Banka tanımları",
+            "is_master": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "banka_kodu",
+                    "type": "string",
+                    "max_length": 10,
+                    "unique": true,
+                    "required": true
+                },
+                {
+                    "name": "banka_adi",
+                    "type": "string",
+                    "max_length": 100,
+                    "required": true
+                },
+                {
+                    "name": "swift_kodu",
+                    "type": "string",
+                    "max_length": 15
+                },
+                {
+                    "name": "logo_url",
+                    "type": "string",
+                    "max_length": 500
+                },
+                {
+                    "name": "aktif",
+                    "type": "boolean",
+                    "default": true
+                }
+            ]
+        },
+        {
+            "pl_table": "banka_sube",
+            "description": "Banka şube tanımları",
+            "is_master": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "banka_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "banka",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "sube_kodu",
+                    "type": "string",
+                    "max_length": 20,
+                    "required": true
+                },
+                {
+                    "name": "sube_adi",
+                    "type": "string",
+                    "max_length": 100,
+                    "required": true
+                },
+                {
+                    "name": "il",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "adres",
+                    "type": "text"
+                },
+                {
+                    "name": "telefon",
+                    "type": "phone"
+                },
+                {
+                    "name": "aktif",
+                    "type": "boolean",
+                    "default": true
+                }
+            ]
+        },
+        {
+            "pl_table": "banka_hesap",
+            "description": "Firma banka hesapları",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "hesap_kodu",
+                    "type": "erp_code",
+                    "unique": true,
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "hesap_adi",
+                    "type": "string",
+                    "max_length": 100,
+                    "required": true
+                },
+                {
+                    "name": "banka_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "banka",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "sube_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "banka_sube",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "hesap_no",
+                    "type": "string",
+                    "max_length": 30
+                },
+                {
+                    "name": "iban",
+                    "type": "iban",
+                    "indexed": true
+                },
+                {
+                    "name": "hesap_tipi",
+                    "type": "enum",
+                    "values": [
+                        "vadesiz",
+                        "vadeli",
+                        "kredi",
+                        "pos",
+                        "yatirim",
+                        "doviz"
+                    ],
+                    "default": "vadesiz"
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "required": true,
+                    "default": "TRY"
+                },
+                {
+                    "name": "acilis_bakiye",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "kredi_limiti",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "faiz_orani",
+                    "type": "percentage"
+                },
+                {
+                    "name": "vade_tarihi",
+                    "type": "date",
+                    "description": "Vadeli hesaplarda vade"
+                },
+                {
+                    "name": "internet_bankaciligi",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "api_entegrasyon",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "sube_kodu_firma",
+                    "type": "string",
+                    "max_length": 20,
+                    "description": "Firma şube kodu"
+                },
+                {
+                    "name": "muhasebe_hesap_kodu",
+                    "type": "account_code"
+                },
+                {
+                    "name": "yetkili_kisi",
+                    "type": "string",
+                    "max_length": 150
+                },
+                {
+                    "name": "yetkili_telefon",
+                    "type": "phone"
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                },
+                {
+                    "name": "aktif",
+                    "type": "boolean",
+                    "default": true
+                }
+            ]
+        },
+        {
+            "pl_table": "banka_hareket",
+            "description": "Banka hesap hareketleri",
+            "is_master": false,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "banka_hesap_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "banka_hesap",
+                        "column": "id",
+                        "on_delete": "RESTRICT"
+                    }
+                },
+                {
+                    "name": "hareket_no",
+                    "type": "document_number",
+                    "indexed": true
+                },
+                {
+                    "name": "hareket_tarihi",
+                    "type": "date",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "valör_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "islem_zamani",
+                    "type": "datetime",
+                    "auto_now_add": true
+                },
+                {
+                    "name": "hareket_tipi",
+                    "type": "enum",
+                    "values": [
+                        "giris",
+                        "cikis"
+                    ],
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "hareket_turu",
+                    "type": "enum",
+                    "values": [
+                        "havale_gelen",
+                        "havale_giden",
+                        "eft_gelen",
+                        "eft_giden",
+                        "cek_tahsil",
+                        "cek_odeme",
+                        "kredi_kullanim",
+                        "kredi_odeme",
+                        "faiz_gelir",
+                        "faiz_gider",
+                        "masraf",
+                        "komisyon",
+                        "kasa_yatirma",
+                        "kasa_cekme",
+                        "virman",
+                        "pos_tahsilat",
+                        "acilis",
+                        "kapalis",
+                        "diger"
+                    ],
+                    "required": true
+                },
+                {
+                    "name": "tutar",
+                    "type": "currency",
+                    "required": true
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "doviz_kuru",
+                    "type": "exchange_rate",
+                    "default": 1
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "indexed": true
+                },
+                {
+                    "name": "dekont_no",
+                    "type": "string",
+                    "max_length": 50,
+                    "indexed": true
+                },
+                {
+                    "name": "referans_no",
+                    "type": "string",
+                    "max_length": 50,
+                    "description": "Banka referans numarası"
+                },
+                {
+                    "name": "belge_no",
+                    "type": "document_number"
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                },
+                {
+                    "name": "gonderici_iban",
+                    "type": "iban"
+                },
+                {
+                    "name": "gonderici_ad",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "alici_iban",
+                    "type": "iban"
+                },
+                {
+                    "name": "alici_ad",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "karsi_hesap_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "banka_hesap",
+                        "column": "id"
+                    },
+                    "description": "Virman için"
+                },
+                {
+                    "name": "kasa_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "kasa",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "cek_senet_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "cek_senet",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "kaynak_modul",
+                    "type": "enum",
+                    "values": [
+                        "satis",
+                        "satin_alma",
+                        "finans",
+                        "pos",
+                        "entegrasyon",
+                        "manuel"
+                    ]
+                },
+                {
+                    "name": "kaynak_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "mutabakat_durumu",
+                    "type": "enum",
+                    "values": [
+                        "beklemede",
+                        "eslesti",
+                        "fark_var"
+                    ],
+                    "default": "beklemede"
+                },
+                {
+                    "name": "mutabakat_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "iptal",
+                    "type": "boolean",
+                    "default": false
+                }
+            ],
+            "indexes": [
+                {
+                    "name": "idx_banka_hareket_tarih",
+                    "columns": [
+                        "banka_hesap_id",
+                        "hareket_tarihi"
+                    ]
+                },
+                {
+                    "name": "idx_banka_hareket_cari",
+                    "columns": [
+                        "cari_id"
+                    ]
+                },
+                {
+                    "name": "idx_banka_hareket_dekont",
+                    "columns": [
+                        "dekont_no"
+                    ]
+                }
+            ]
+        },
+        {
+            "pl_table": "cek_senet",
+            "description": "Çek ve senet kayıtları",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "cek_senet_no",
+                    "type": "document_number",
+                    "unique": true,
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "cek_senet_tipi",
+                    "type": "enum",
+                    "values": [
+                        "musteri_ceki",
+                        "firma_ceki",
+                        "musteri_senedi",
+                        "firma_senedi"
+                    ],
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "portfoy_no",
+                    "type": "string",
+                    "max_length": 50,
+                    "indexed": true
+                },
+                {
+                    "name": "duzenleme_tarihi",
+                    "type": "date",
+                    "required": true
+                },
+                {
+                    "name": "vade_tarihi",
+                    "type": "date",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "tutar",
+                    "type": "currency",
+                    "required": true
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "doviz_kuru",
+                    "type": "exchange_rate",
+                    "default": 1
+                },
+                {
+                    "name": "borc_cari_id",
+                    "type": "bigint",
+                    "indexed": true,
+                    "description": "Borçlu cari"
+                },
+                {
+                    "name": "alacak_cari_id",
+                    "type": "bigint",
+                    "indexed": true,
+                    "description": "Alacaklı cari"
+                },
+                {
+                    "name": "ciranta_cari_id",
+                    "type": "bigint",
+                    "description": "Ciranta cari"
+                },
+                {
+                    "name": "kesideci_adi",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "kesideci_vergi_no",
+                    "type": "tax_number"
+                },
+                {
+                    "name": "banka_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "banka",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "sube_kodu",
+                    "type": "string",
+                    "max_length": 20
+                },
+                {
+                    "name": "hesap_no",
+                    "type": "string",
+                    "max_length": 30
+                },
+                {
+                    "name": "iban",
+                    "type": "iban"
+                },
+                {
+                    "name": "aval_veren",
+                    "type": "string",
+                    "max_length": 200,
+                    "description": "Aval/kefil"
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "portfoyde",
+                        "ciro_edildi",
+                        "tahsile_verildi",
+                        "tahsil_edildi",
+                        "odendi",
+                        "karsilik_yok",
+                        "protesto",
+                        "iade",
+                        "teminata_verildi",
+                        "iptal"
+                    ],
+                    "default": "portfoyde",
+                    "indexed": true
+                },
+                {
+                    "name": "son_islem_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "tahsil_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "odeme_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "tahsil_banka_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "banka_hesap",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "bordro_no",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                },
+                {
+                    "name": "resim_url",
+                    "type": "string",
+                    "max_length": 500,
+                    "description": "Çek/senet görseli"
+                }
+            ],
+            "indexes": [
+                {
+                    "name": "idx_cek_vade",
+                    "columns": [
+                        "vade_tarihi",
+                        "durum"
+                    ]
+                },
+                {
+                    "name": "idx_cek_borc_cari",
+                    "columns": [
+                        "borc_cari_id"
+                    ]
+                },
+                {
+                    "name": "idx_cek_alacak_cari",
+                    "columns": [
+                        "alacak_cari_id"
+                    ]
+                },
+                {
+                    "name": "idx_cek_portfoy",
+                    "columns": [
+                        "portfoy_no"
+                    ]
+                }
+            ]
+        },
+        {
+            "pl_table": "cek_senet_hareket",
+            "description": "Çek/senet hareket geçmişi",
+            "is_master": false,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "cek_senet_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "cek_senet",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "hareket_tarihi",
+                    "type": "date",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "islem_zamani",
+                    "type": "datetime",
+                    "auto_now_add": true
+                },
+                {
+                    "name": "hareket_tipi",
+                    "type": "enum",
+                    "values": [
+                        "giris",
+                        "ciro",
+                        "tahsile_gonderme",
+                        "tahsil",
+                        "odeme",
+                        "iade",
+                        "protesto",
+                        "teminat",
+                        "iptal"
+                    ],
+                    "required": true
+                },
+                {
+                    "name": "onceki_durum",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "yeni_durum",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "description": "İlgili cari"
+                },
+                {
+                    "name": "banka_hesap_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "banka_hesap",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "bordro_no",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                },
+                {
+                    "name": "kullanici",
+                    "type": "string",
+                    "max_length": 100
+                }
+            ]
+        },
+        {
+            "pl_table": "cek_senet_bordro",
+            "description": "Çek/senet bordroları",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "bordro_no",
+                    "type": "document_number",
+                    "unique": true,
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "bordro_tarihi",
+                    "type": "date",
+                    "required": true
+                },
+                {
+                    "name": "bordro_tipi",
+                    "type": "enum",
+                    "values": [
+                        "tahsilat",
+                        "odeme",
+                        "ciro",
+                        "tahsile_gonderme",
+                        "teminata_verme"
+                    ],
+                    "required": true
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "indexed": true
+                },
+                {
+                    "name": "banka_hesap_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "banka_hesap",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "toplam_adet",
+                    "type": "integer",
+                    "default": 0
+                },
+                {
+                    "name": "toplam_tutar",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "taslak",
+                        "onaylandi",
+                        "iptal"
+                    ],
+                    "default": "taslak"
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "pl_table": "cek_senet_bordro_detay",
+            "description": "Bordro içindeki çekler/senetler",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "bordro_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "cek_senet_bordro",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "cek_senet_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "cek_senet",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "sira_no",
+                    "type": "integer"
+                }
+            ]
+        },
+        {
+            "pl_table": "pos_terminal",
+            "description": "POS terminal tanımları",
+            "is_master": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "terminal_kodu",
+                    "type": "erp_code",
+                    "unique": true,
+                    "required": true
+                },
+                {
+                    "name": "terminal_adi",
+                    "type": "string",
+                    "max_length": 100,
+                    "required": true
+                },
+                {
+                    "name": "terminal_no",
+                    "type": "string",
+                    "max_length": 20
+                },
+                {
+                    "name": "merchant_no",
+                    "type": "string",
+                    "max_length": 20
+                },
+                {
+                    "name": "banka_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "banka",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "banka_hesap_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "banka_hesap",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "komisyon_orani",
+                    "type": "percentage",
+                    "default": 0
+                },
+                {
+                    "name": "taksit_komisyon",
+                    "type": "json",
+                    "description": "Taksit bazlı komisyon oranları"
+                },
+                {
+                    "name": "valör_gun",
+                    "type": "integer",
+                    "default": 1
+                },
+                {
+                    "name": "sube_kodu",
+                    "type": "string",
+                    "max_length": 20
+                },
+                {
+                    "name": "kasa_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "kasa",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "aktif",
+                    "type": "boolean",
+                    "default": true
+                }
+            ]
+        },
+        {
+            "pl_table": "pos_islem",
+            "description": "POS işlemleri",
+            "is_master": false,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "terminal_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "pos_terminal",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "islem_tarihi",
+                    "type": "datetime",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "islem_tipi",
+                    "type": "enum",
+                    "values": [
+                        "satis",
+                        "iade",
+                        "iptal"
+                    ],
+                    "required": true
+                },
+                {
+                    "name": "tutar",
+                    "type": "currency",
+                    "required": true
+                },
+                {
+                    "name": "net_tutar",
+                    "type": "currency",
+                    "description": "Komisyon düşülmüş tutar"
+                },
+                {
+                    "name": "komisyon_tutari",
+                    "type": "currency"
+                },
+                {
+                    "name": "taksit_sayisi",
+                    "type": "integer",
+                    "default": 1
+                },
+                {
+                    "name": "kart_tipi",
+                    "type": "enum",
+                    "values": [
+                        "kredi",
+                        "banka",
+                        "prepaid"
+                    ],
+                    "default": "kredi"
+                },
+                {
+                    "name": "kart_no_masked",
+                    "type": "string",
+                    "max_length": 20,
+                    "description": "Son 4 hane"
+                },
+                {
+                    "name": "onay_kodu",
+                    "type": "string",
+                    "max_length": 20
+                },
+                {
+                    "name": "referans_no",
+                    "type": "string",
+                    "max_length": 50,
+                    "indexed": true
+                },
+                {
+                    "name": "batch_no",
+                    "type": "string",
+                    "max_length": 20
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "indexed": true
+                },
+                {
+                    "name": "fis_no",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "basarili",
+                        "basarisiz",
+                        "beklemede",
+                        "iptal",
+                        "iade"
+                    ],
+                    "default": "basarili"
+                },
+                {
+                    "name": "hata_mesaji",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "kaynak_modul",
+                    "type": "enum",
+                    "values": [
+                        "satis",
+                        "tahsilat",
+                        "manuel"
+                    ]
+                },
+                {
+                    "name": "kaynak_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "mutabakat_durumu",
+                    "type": "enum",
+                    "values": [
+                        "beklemede",
+                        "eslesti",
+                        "fark_var"
+                    ],
+                    "default": "beklemede"
+                }
+            ]
+        },
+        {
+            "pl_table": "odeme_emri",
+            "description": "Toplu ödeme emirleri",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "emir_no",
+                    "type": "document_number",
+                    "unique": true,
+                    "required": true
+                },
+                {
+                    "name": "emir_tarihi",
+                    "type": "date",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "banka_hesap_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "banka_hesap",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "odeme_tipi",
+                    "type": "enum",
+                    "values": [
+                        "tek",
+                        "toplu",
+                        "dosya"
+                    ],
+                    "default": "tek"
+                },
+                {
+                    "name": "toplam_adet",
+                    "type": "integer",
+                    "default": 0
+                },
+                {
+                    "name": "toplam_tutar",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "taslak",
+                        "onay_bekliyor",
+                        "onaylandi",
+                        "bankaya_gonderildi",
+                        "tamamlandi",
+                        "iptal"
+                    ],
+                    "default": "taslak"
+                },
+                {
+                    "name": "onaylayan_1",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "onay_tarihi_1",
+                    "type": "datetime"
+                },
+                {
+                    "name": "onaylayan_2",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "onay_tarihi_2",
+                    "type": "datetime"
+                },
+                {
+                    "name": "gonderim_tarihi",
+                    "type": "datetime"
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "pl_table": "odeme_emri_detay",
+            "description": "Ödeme emri kalemleri",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "emir_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "odeme_emri",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "sira_no",
+                    "type": "integer"
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "indexed": true
+                },
+                {
+                    "name": "alici_ad",
+                    "type": "string",
+                    "max_length": 200,
+                    "required": true
+                },
+                {
+                    "name": "alici_iban",
+                    "type": "iban",
+                    "required": true
+                },
+                {
+                    "name": "tutar",
+                    "type": "currency",
+                    "required": true
+                },
+                {
+                    "name": "odeme_tipi",
+                    "type": "enum",
+                    "values": [
+                        "havale",
+                        "eft",
+                        "fast"
+                    ],
+                    "default": "eft"
+                },
+                {
+                    "name": "aciklama",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "beklemede",
+                        "gonderildi",
+                        "tamamlandi",
+                        "hata"
+                    ],
+                    "default": "beklemede"
+                },
+                {
+                    "name": "banka_referans",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "hata_mesaji",
+                    "type": "string",
+                    "max_length": 200
+                }
+            ]
+        },
+        {
+            "pl_table": "kredi",
+            "description": "Banka kredileri",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "kredi_kodu",
+                    "type": "erp_code",
+                    "unique": true,
+                    "required": true
+                },
+                {
+                    "name": "kredi_adi",
+                    "type": "string",
+                    "max_length": 100,
+                    "required": true
+                },
+                {
+                    "name": "banka_hesap_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "banka_hesap",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "kredi_tipi",
+                    "type": "enum",
+                    "values": [
+                        "isletme",
+                        "yatirim",
+                        "taksitli",
+                        "rotatif",
+                        "spot"
+                    ],
+                    "required": true
+                },
+                {
+                    "name": "baslangic_tarihi",
+                    "type": "date",
+                    "required": true
+                },
+                {
+                    "name": "bitis_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "kredi_tutari",
+                    "type": "currency",
+                    "required": true
+                },
+                {
+                    "name": "kullanilan_tutar",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "kalan_tutar",
+                    "type": "currency"
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "faiz_orani",
+                    "type": "percentage",
+                    "required": true
+                },
+                {
+                    "name": "faiz_tipi",
+                    "type": "enum",
+                    "values": [
+                        "sabit",
+                        "degisken"
+                    ],
+                    "default": "sabit"
+                },
+                {
+                    "name": "taksit_sayisi",
+                    "type": "integer"
+                },
+                {
+                    "name": "taksit_tutari",
+                    "type": "currency"
+                },
+                {
+                    "name": "bsmv_orani",
+                    "type": "percentage",
+                    "default": 5
+                },
+                {
+                    "name": "kkdf_orani",
+                    "type": "percentage",
+                    "default": 0
+                },
+                {
+                    "name": "muhasebe_hesap_kodu",
+                    "type": "account_code"
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "aktif",
+                        "kapatildi",
+                        "temerrut"
+                    ],
+                    "default": "aktif"
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "pl_table": "kredi_taksit",
+            "description": "Kredi taksit planı",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "kredi_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "kredi",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "taksit_no",
+                    "type": "integer",
+                    "required": true
+                },
+                {
+                    "name": "vade_tarihi",
+                    "type": "date",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "anapar",
+                    "type": "currency",
+                    "required": true
+                },
+                {
+                    "name": "faiz",
+                    "type": "currency",
+                    "required": true
+                },
+                {
+                    "name": "bsmv",
+                    "type": "currency"
+                },
+                {
+                    "name": "kkdf",
+                    "type": "currency"
+                },
+                {
+                    "name": "toplam_taksit",
+                    "type": "currency",
+                    "required": true
+                },
+                {
+                    "name": "odenen_tutar",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "kalan_tutar",
+                    "type": "currency"
+                },
+                {
+                    "name": "odeme_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "beklemede",
+                        "odendi",
+                        "gecikme"
+                    ],
+                    "default": "beklemede"
+                }
+            ]
+        },
+        {
+            "pl_table": "virman",
+            "description": "Hesaplar arası virman",
+            "is_master": true,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "virman_no",
+                    "type": "document_number",
+                    "unique": true,
+                    "required": true
+                },
+                {
+                    "name": "virman_tarihi",
+                    "type": "date",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "virman_tipi",
+                    "type": "enum",
+                    "values": [
+                        "kasa_kasa",
+                        "banka_banka",
+                        "kasa_banka",
+                        "banka_kasa"
+                    ],
+                    "required": true
+                },
+                {
+                    "name": "kaynak_kasa_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "kasa",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "kaynak_banka_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "banka_hesap",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "hedef_kasa_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "kasa",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "hedef_banka_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "banka_hesap",
+                        "column": "id"
+                    }
+                },
+                {
+                    "name": "tutar",
+                    "type": "currency",
+                    "required": true
+                },
+                {
+                    "name": "kaynak_pb",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "hedef_pb",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "doviz_kuru",
+                    "type": "exchange_rate",
+                    "default": 1
+                },
+                {
+                    "name": "hedef_tutar",
+                    "type": "currency"
+                },
+                {
+                    "name": "masraf_tutari",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "taslak",
+                        "tamamlandi",
+                        "iptal"
+                    ],
+                    "default": "tamamlandi"
+                }
+            ]
+        }
+    ],
+    "views": [
+        {
+            "name": "kasa_bakiye",
+            "description": "Kasa güncel bakiyeleri",
+            "base_tables": [
+                "kasa",
+                "kasa_hareket"
+            ],
+            "columns": [
+                {
+                    "name": "kasa_id",
+                    "source": "kasa.id"
+                },
+                {
+                    "name": "kasa_kodu",
+                    "source": "kasa.kasa_kodu"
+                },
+                {
+                    "name": "kasa_adi",
+                    "source": "kasa.kasa_adi"
+                },
+                {
+                    "name": "para_birimi",
+                    "source": "kasa.para_birimi"
+                },
+                {
+                    "name": "toplam_giris",
+                    "aggregation": "SUM(giris)"
+                },
+                {
+                    "name": "toplam_cikis",
+                    "aggregation": "SUM(cikis)"
+                },
+                {
+                    "name": "bakiye",
+                    "computed": "acilis_bakiye + toplam_giris - toplam_cikis"
+                },
+                {
+                    "name": "son_hareket",
+                    "aggregation": "MAX(hareket_tarihi)"
+                }
+            ]
+        },
+        {
+            "name": "banka_bakiye",
+            "description": "Banka hesap bakiyeleri",
+            "base_tables": [
+                "banka_hesap",
+                "banka_hareket"
+            ],
+            "columns": [
+                {
+                    "name": "hesap_id",
+                    "source": "banka_hesap.id"
+                },
+                {
+                    "name": "hesap_kodu",
+                    "source": "banka_hesap.hesap_kodu"
+                },
+                {
+                    "name": "hesap_adi",
+                    "source": "banka_hesap.hesap_adi"
+                },
+                {
+                    "name": "banka_adi",
+                    "source": "banka.banka_adi"
+                },
+                {
+                    "name": "para_birimi",
+                    "source": "banka_hesap.para_birimi"
+                },
+                {
+                    "name": "bakiye",
+                    "computed": "acilis + girisler - cikislar"
+                },
+                {
+                    "name": "kullanilabilir",
+                    "computed": "bakiye + kredi_limiti"
+                }
+            ]
+        },
+        {
+            "name": "cek_senet_vade_raporu",
+            "description": "Çek/senet vade dağılımı",
+            "base_tables": [
+                "cek_senet"
+            ],
+            "columns": [
+                {
+                    "name": "hafta_1",
+                    "aggregation": "Bu hafta vadeli"
+                },
+                {
+                    "name": "hafta_2",
+                    "aggregation": "Gelecek hafta vadeli"
+                },
+                {
+                    "name": "ay_1",
+                    "aggregation": "Bu ay vadeli"
+                },
+                {
+                    "name": "ay_2",
+                    "aggregation": "Gelecek ay vadeli"
+                },
+                {
+                    "name": "uzun_vade",
+                    "aggregation": "2+ ay vadeli"
+                },
+                {
+                    "name": "toplam",
+                    "computed": "Tüm portföy"
+                }
+            ]
+        },
+        {
+            "name": "nakit_akis_ozet",
+            "description": "Günlük nakit akış özeti",
+            "base_tables": [
+                "kasa_hareket",
+                "banka_hareket"
+            ],
+            "columns": [
+                {
+                    "name": "tarih",
+                    "source": "hareket_tarihi"
+                },
+                {
+                    "name": "kasa_giris",
+                    "aggregation": "SUM(kasa_giris)"
+                },
+                {
+                    "name": "kasa_cikis",
+                    "aggregation": "SUM(kasa_cikis)"
+                },
+                {
+                    "name": "banka_giris",
+                    "aggregation": "SUM(banka_giris)"
+                },
+                {
+                    "name": "banka_cikis",
+                    "aggregation": "SUM(banka_cikis)"
+                },
+                {
+                    "name": "net_akis",
+                    "computed": "girisler - cikislar"
+                }
+            ]
+        },
+        {
+            "name": "vadesi_gelen_odemeler",
+            "description": "Yaklaşan ödeme yükümlülükleri",
+            "base_tables": [
+                "cek_senet",
+                "kredi_taksit"
+            ],
+            "columns": [
+                {
+                    "name": "tip",
+                    "computed": "cek/senet/kredi"
+                },
+                {
+                    "name": "vade_tarihi",
+                    "source": "vade_tarihi"
+                },
+                {
+                    "name": "tutar",
+                    "source": "tutar"
+                },
+                {
+                    "name": "aciklama",
+                    "source": "detay"
+                }
+            ]
+        },
+        {
+            "name": "pos_gunluk_rapor",
+            "description": "Günlük POS işlem özeti",
+            "base_tables": [
+                "pos_islem",
+                "pos_terminal"
+            ],
+            "columns": [
+                {
+                    "name": "tarih",
+                    "source": "islem_tarihi"
+                },
+                {
+                    "name": "terminal",
+                    "source": "terminal_adi"
+                },
+                {
+                    "name": "islem_adedi",
+                    "aggregation": "COUNT(*)"
+                },
+                {
+                    "name": "toplam_tutar",
+                    "aggregation": "SUM(tutar)"
+                },
+                {
+                    "name": "toplam_komisyon",
+                    "aggregation": "SUM(komisyon)"
+                },
+                {
+                    "name": "net_tutar",
+                    "aggregation": "SUM(net_tutar)"
+                }
+            ]
+        }
+    ],
+    "business_rules": [
+        {
+            "code": "FN001",
+            "type": "validation",
+            "description": "Kasa bakiyesi negatif olamaz"
+        },
+        {
+            "code": "FN002",
+            "type": "warning",
+            "description": "Kasa limiti aşımında uyarı"
+        },
+        {
+            "code": "FN003",
+            "type": "validation",
+            "description": "Çek/senet durumu geçiş kuralları"
+        },
+        {
+            "code": "FN004",
+            "type": "warning",
+            "description": "Vadesi gelen çek/senet 7 gün önce uyarı"
+        },
+        {
+            "code": "FN005",
+            "type": "validation",
+            "description": "Virman'da kaynak ve hedef farklı olmalı"
+        },
+        {
+            "code": "FN006",
+            "type": "info",
+            "description": "POS mutabakat kontrolü günlük"
+        },
+        {
+            "code": "FN007",
+            "type": "validation",
+            "description": "Ödeme emri çift onay gerektirir"
+        }
+    ]
+}

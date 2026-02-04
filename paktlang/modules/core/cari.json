@@ -1,0 +1,2075 @@
+{
+    "$schema": "paktlang://schema/module/v1",
+    "$id": "paktlang://modules/cari/v1",
+    "module": "cari",
+    "version": "1.1.0",
+    "description": "Müşteri ve tedarikçi cari hesap yönetimi modülü",
+    "dependencies": [],
+    "priority": "high",
+    "tables": [
+        {
+            "pl_table": "cari_kart",
+            "description": "Cari hesap ana kartları - müşteri ve tedarikçi bilgileri",
+            "is_master": true,
+            "audit": true,
+            "soft_delete": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true,
+                    "description": "Benzersiz kayıt ID"
+                },
+                {
+                    "name": "cari_kodu",
+                    "type": "erp_code",
+                    "unique": true,
+                    "required": true,
+                    "indexed": true,
+                    "description": "Cari hesap kodu"
+                },
+                {
+                    "name": "unvan",
+                    "type": "string",
+                    "max_length": 300,
+                    "required": true,
+                    "indexed": true,
+                    "description": "Firma/kişi unvanı"
+                },
+                {
+                    "name": "kisa_ad",
+                    "type": "string",
+                    "max_length": 100,
+                    "description": "Kısa ad/takma ad"
+                },
+                {
+                    "name": "ticari_unvan",
+                    "type": "string",
+                    "max_length": 300,
+                    "description": "Resmi ticari unvan"
+                },
+                {
+                    "name": "cari_tipi",
+                    "type": "enum",
+                    "values": [
+                        "musteri",
+                        "tedarikci",
+                        "her_ikisi",
+                        "personel",
+                        "ortak",
+                        "devlet",
+                        "diger"
+                    ],
+                    "required": true,
+                    "default": "musteri",
+                    "indexed": true
+                },
+                {
+                    "name": "cari_sinifi",
+                    "type": "enum",
+                    "values": [
+                        "a_sinifi",
+                        "b_sinifi",
+                        "c_sinifi",
+                        "vip",
+                        "standart"
+                    ],
+                    "default": "standart",
+                    "description": "Müşteri sınıflandırması"
+                },
+                {
+                    "name": "cari_grubu_id",
+                    "type": "bigint",
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "cari_grup",
+                        "column": "id",
+                        "on_delete": "SET NULL"
+                    }
+                },
+                {
+                    "name": "alt_grup_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "cari_alt_grup",
+                        "column": "id",
+                        "on_delete": "SET NULL"
+                    }
+                },
+                {
+                    "name": "vergi_no",
+                    "type": "tax_number",
+                    "indexed": true,
+                    "description": "Vergi numarası"
+                },
+                {
+                    "name": "vergi_dairesi",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "tc_kimlik_no",
+                    "type": "tc_kimlik"
+                },
+                {
+                    "name": "mersis_no",
+                    "type": "string",
+                    "max_length": 20,
+                    "description": "MERSİS numarası"
+                },
+                {
+                    "name": "ticaret_sicil_no",
+                    "type": "string",
+                    "max_length": 50,
+                    "description": "Ticaret sicil numarası"
+                },
+                {
+                    "name": "telefon",
+                    "type": "phone"
+                },
+                {
+                    "name": "telefon_2",
+                    "type": "phone"
+                },
+                {
+                    "name": "telefon_3",
+                    "type": "phone"
+                },
+                {
+                    "name": "fax",
+                    "type": "phone"
+                },
+                {
+                    "name": "email",
+                    "type": "email"
+                },
+                {
+                    "name": "email_2",
+                    "type": "email"
+                },
+                {
+                    "name": "web_sitesi",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "linkedin",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "yetkili_kisi",
+                    "type": "string",
+                    "max_length": 150
+                },
+                {
+                    "name": "yetkili_unvan",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "yetkili_telefon",
+                    "type": "phone"
+                },
+                {
+                    "name": "yetkili_email",
+                    "type": "email"
+                },
+                {
+                    "name": "risk_limiti",
+                    "type": "currency",
+                    "default": 0
+                },
+                {
+                    "name": "risk_limiti_doviz",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "gecici_risk_limiti",
+                    "type": "currency",
+                    "description": "Geçici risk limiti"
+                },
+                {
+                    "name": "gecici_limit_bitis",
+                    "type": "date",
+                    "description": "Geçici limit bitiş tarihi"
+                },
+                {
+                    "name": "vade_gunu",
+                    "type": "integer",
+                    "min": 0,
+                    "max": 730,
+                    "default": 30
+                },
+                {
+                    "name": "ek_vade_gunu",
+                    "type": "integer",
+                    "min": 0,
+                    "max": 90,
+                    "default": 0,
+                    "description": "Ek vade toleransı"
+                },
+                {
+                    "name": "odeme_sekli",
+                    "type": "enum",
+                    "values": [
+                        "nakit",
+                        "kredi_karti",
+                        "havale",
+                        "eft",
+                        "cek",
+                        "senet",
+                        "acik_hesap",
+                        "kapida_odeme",
+                        "diger"
+                    ],
+                    "default": "havale"
+                },
+                {
+                    "name": "iskonto_orani",
+                    "type": "discount_rate",
+                    "default": 0
+                },
+                {
+                    "name": "iskonto_orani_2",
+                    "type": "discount_rate",
+                    "default": 0
+                },
+                {
+                    "name": "iskonto_orani_3",
+                    "type": "discount_rate",
+                    "default": 0
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "fiyat_listesi_id",
+                    "type": "bigint",
+                    "description": "Varsayılan fiyat listesi"
+                },
+                {
+                    "name": "ulke_kodu",
+                    "type": "country_code",
+                    "default": "TR"
+                },
+                {
+                    "name": "bolge_kodu",
+                    "type": "string",
+                    "max_length": 20,
+                    "description": "Satış bölgesi"
+                },
+                {
+                    "name": "sektor_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "sektor",
+                        "column": "id",
+                        "on_delete": "SET NULL"
+                    }
+                },
+                {
+                    "name": "faaliyet_alani",
+                    "type": "text",
+                    "description": "Detaylı faaliyet alanı"
+                },
+                {
+                    "name": "calisan_sayisi",
+                    "type": "enum",
+                    "values": [
+                        "1-10",
+                        "11-50",
+                        "51-100",
+                        "101-250",
+                        "251-500",
+                        "500+"
+                    ]
+                },
+                {
+                    "name": "kurulus_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "referans_kaynak",
+                    "type": "enum",
+                    "values": [
+                        "web",
+                        "referans",
+                        "fuar",
+                        "reklam",
+                        "sosyal_medya",
+                        "diger"
+                    ]
+                },
+                {
+                    "name": "referans_cari_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "cari_kart",
+                        "column": "id",
+                        "on_delete": "SET NULL"
+                    }
+                },
+                {
+                    "name": "temsilci_id",
+                    "type": "bigint",
+                    "description": "Satış temsilcisi ID"
+                },
+                {
+                    "name": "muhasebe_hesap_kodu",
+                    "type": "account_code",
+                    "description": "Bağlı muhasebe hesabı"
+                },
+                {
+                    "name": "efatura_kayitli",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "efatura_alias",
+                    "type": "string",
+                    "max_length": 50,
+                    "description": "e-Fatura posta kutusu"
+                },
+                {
+                    "name": "efatura_etiket",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "eirsaliye_kayitli",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "tevkifat_dahil",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "tevkifat_orani",
+                    "type": "percentage"
+                },
+                {
+                    "name": "kdv_muaf",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "kdv_muafiyet_sebebi",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "ozel_matrah",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "notlar",
+                    "type": "text"
+                },
+                {
+                    "name": "dahili_notlar",
+                    "type": "text",
+                    "description": "Sadece dahili görüntülenen notlar"
+                },
+                {
+                    "name": "etiketler",
+                    "type": "json",
+                    "description": "Özel etiketler"
+                },
+                {
+                    "name": "ozel_alanlar",
+                    "type": "json",
+                    "description": "Kullanıcı tanımlı özel alanlar"
+                },
+                {
+                    "name": "puan",
+                    "type": "integer",
+                    "min": 0,
+                    "max": 100,
+                    "description": "Müşteri puanı"
+                },
+                {
+                    "name": "son_islem_tarihi",
+                    "type": "date",
+                    "description": "Son işlem tarihi"
+                },
+                {
+                    "name": "ilk_islem_tarihi",
+                    "type": "date",
+                    "description": "İlk işlem tarihi"
+                },
+                {
+                    "name": "aktif",
+                    "type": "boolean",
+                    "default": true,
+                    "indexed": true
+                },
+                {
+                    "name": "bloke",
+                    "type": "boolean",
+                    "default": false,
+                    "description": "İşlem blokesi"
+                },
+                {
+                    "name": "bloke_sebebi",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "olusturma_tarihi",
+                    "type": "datetime",
+                    "auto_now_add": true
+                },
+                {
+                    "name": "guncelleme_tarihi",
+                    "type": "datetime",
+                    "auto_now": true
+                },
+                {
+                    "name": "olusturan_kullanici",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "guncelleyen_kullanici",
+                    "type": "string",
+                    "max_length": 100
+                }
+            ],
+            "indexes": [
+                {
+                    "name": "idx_cari_tipi",
+                    "columns": [
+                        "cari_tipi"
+                    ]
+                },
+                {
+                    "name": "idx_cari_sinifi",
+                    "columns": [
+                        "cari_sinifi"
+                    ]
+                },
+                {
+                    "name": "idx_cari_vergi",
+                    "columns": [
+                        "vergi_no"
+                    ]
+                },
+                {
+                    "name": "idx_cari_grup",
+                    "columns": [
+                        "cari_grubu_id"
+                    ]
+                },
+                {
+                    "name": "idx_cari_temsilci",
+                    "columns": [
+                        "temsilci_id"
+                    ]
+                },
+                {
+                    "name": "idx_cari_bolge",
+                    "columns": [
+                        "bolge_kodu"
+                    ]
+                },
+                {
+                    "name": "idx_cari_aktif",
+                    "columns": [
+                        "aktif",
+                        "bloke"
+                    ]
+                }
+            ]
+        },
+        {
+            "pl_table": "cari_grup",
+            "description": "Cari hesap ana grupları",
+            "is_master": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "grup_kodu",
+                    "type": "erp_code",
+                    "unique": true,
+                    "required": true
+                },
+                {
+                    "name": "grup_adi",
+                    "type": "string",
+                    "max_length": 100,
+                    "required": true
+                },
+                {
+                    "name": "ust_grup_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "cari_grup",
+                        "column": "id",
+                        "on_delete": "SET NULL"
+                    }
+                },
+                {
+                    "name": "seviye",
+                    "type": "integer",
+                    "min": 1,
+                    "max": 5,
+                    "default": 1
+                },
+                {
+                    "name": "varsayilan_vade",
+                    "type": "integer"
+                },
+                {
+                    "name": "varsayilan_iskonto",
+                    "type": "discount_rate"
+                },
+                {
+                    "name": "muhasebe_hesap_kodu",
+                    "type": "account_code"
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                },
+                {
+                    "name": "renk_kodu",
+                    "type": "string",
+                    "max_length": 7,
+                    "description": "HEX renk kodu"
+                },
+                {
+                    "name": "aktif",
+                    "type": "boolean",
+                    "default": true
+                }
+            ]
+        },
+        {
+            "pl_table": "cari_alt_grup",
+            "description": "Cari hesap alt grupları",
+            "is_master": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "alt_grup_kodu",
+                    "type": "erp_code",
+                    "unique": true,
+                    "required": true
+                },
+                {
+                    "name": "alt_grup_adi",
+                    "type": "string",
+                    "max_length": 100,
+                    "required": true
+                },
+                {
+                    "name": "ana_grup_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "cari_grup",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                },
+                {
+                    "name": "aktif",
+                    "type": "boolean",
+                    "default": true
+                }
+            ]
+        },
+        {
+            "pl_table": "sektor",
+            "description": "Sektör tanımları",
+            "is_master": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "sektor_kodu",
+                    "type": "erp_code",
+                    "unique": true,
+                    "required": true
+                },
+                {
+                    "name": "sektor_adi",
+                    "type": "string",
+                    "max_length": 150,
+                    "required": true
+                },
+                {
+                    "name": "ust_sektor_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "sektor",
+                        "column": "id",
+                        "on_delete": "SET NULL"
+                    }
+                },
+                {
+                    "name": "nace_kodu",
+                    "type": "string",
+                    "max_length": 20,
+                    "description": "NACE faaliyet kodu"
+                },
+                {
+                    "name": "aktif",
+                    "type": "boolean",
+                    "default": true
+                }
+            ]
+        },
+        {
+            "pl_table": "cari_adres",
+            "description": "Cari hesap adresleri",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "cari_kart",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "adres_tipi",
+                    "type": "enum",
+                    "values": [
+                        "fatura",
+                        "sevkiyat",
+                        "merkez",
+                        "sube",
+                        "depo",
+                        "fabrika",
+                        "ofis",
+                        "diger"
+                    ],
+                    "required": true,
+                    "default": "merkez"
+                },
+                {
+                    "name": "adres_adi",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "adres_satir_1",
+                    "type": "string",
+                    "max_length": 300,
+                    "required": true
+                },
+                {
+                    "name": "adres_satir_2",
+                    "type": "string",
+                    "max_length": 300
+                },
+                {
+                    "name": "mahalle",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "cadde_sokak",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "bina_no",
+                    "type": "string",
+                    "max_length": 20
+                },
+                {
+                    "name": "daire_no",
+                    "type": "string",
+                    "max_length": 20
+                },
+                {
+                    "name": "ilce",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "il",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "posta_kodu",
+                    "type": "string",
+                    "max_length": 10
+                },
+                {
+                    "name": "ulke",
+                    "type": "string",
+                    "max_length": 50,
+                    "default": "Türkiye"
+                },
+                {
+                    "name": "ulke_kodu",
+                    "type": "country_code",
+                    "default": "TR"
+                },
+                {
+                    "name": "enlem",
+                    "type": "decimal",
+                    "precision": 10,
+                    "scale": 8,
+                    "description": "GPS enlem"
+                },
+                {
+                    "name": "boylam",
+                    "type": "decimal",
+                    "precision": 11,
+                    "scale": 8,
+                    "description": "GPS boylam"
+                },
+                {
+                    "name": "telefon",
+                    "type": "phone"
+                },
+                {
+                    "name": "yetkili_kisi",
+                    "type": "string",
+                    "max_length": 150
+                },
+                {
+                    "name": "yetkili_telefon",
+                    "type": "phone"
+                },
+                {
+                    "name": "calısma_saatleri",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "teslimat_notu",
+                    "type": "text"
+                },
+                {
+                    "name": "varsayilan_fatura",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "varsayilan_sevkiyat",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "aktif",
+                    "type": "boolean",
+                    "default": true
+                }
+            ],
+            "indexes": [
+                {
+                    "name": "idx_adres_cari",
+                    "columns": [
+                        "cari_id"
+                    ]
+                },
+                {
+                    "name": "idx_adres_tip",
+                    "columns": [
+                        "cari_id",
+                        "adres_tipi"
+                    ]
+                },
+                {
+                    "name": "idx_adres_il",
+                    "columns": [
+                        "il"
+                    ]
+                }
+            ]
+        },
+        {
+            "pl_table": "cari_banka",
+            "description": "Cari hesap banka bilgileri",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "cari_kart",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "hesap_adi",
+                    "type": "string",
+                    "max_length": 100,
+                    "description": "Hesap tanım adı"
+                },
+                {
+                    "name": "banka_adi",
+                    "type": "string",
+                    "max_length": 100,
+                    "required": true
+                },
+                {
+                    "name": "banka_kodu",
+                    "type": "string",
+                    "max_length": 10
+                },
+                {
+                    "name": "sube_adi",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "sube_kodu",
+                    "type": "string",
+                    "max_length": 20
+                },
+                {
+                    "name": "hesap_no",
+                    "type": "string",
+                    "max_length": 30
+                },
+                {
+                    "name": "iban",
+                    "type": "iban"
+                },
+                {
+                    "name": "swift_kodu",
+                    "type": "string",
+                    "max_length": 15
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "hesap_sahibi",
+                    "type": "string",
+                    "max_length": 200,
+                    "description": "Hesap sahibi adı"
+                },
+                {
+                    "name": "varsayilan",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "aktif",
+                    "type": "boolean",
+                    "default": true
+                }
+            ]
+        },
+        {
+            "pl_table": "cari_yetkili",
+            "description": "Cari hesap yetkili kişileri",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "cari_kart",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "ad_soyad",
+                    "type": "string",
+                    "max_length": 150,
+                    "required": true
+                },
+                {
+                    "name": "unvan",
+                    "type": "string",
+                    "max_length": 100,
+                    "description": "Görev unvanı"
+                },
+                {
+                    "name": "departman",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "telefon",
+                    "type": "phone"
+                },
+                {
+                    "name": "dahili",
+                    "type": "string",
+                    "max_length": 10
+                },
+                {
+                    "name": "cep_telefonu",
+                    "type": "phone"
+                },
+                {
+                    "name": "email",
+                    "type": "email"
+                },
+                {
+                    "name": "linkedin",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "dogum_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "yetki_alani",
+                    "type": "enum",
+                    "values": [
+                        "genel",
+                        "satis",
+                        "satin_alma",
+                        "muhasebe",
+                        "teknik",
+                        "yonetim",
+                        "diger"
+                    ]
+                },
+                {
+                    "name": "iletisim_tercihi",
+                    "type": "enum",
+                    "values": [
+                        "telefon",
+                        "email",
+                        "whatsapp",
+                        "herhangi"
+                    ],
+                    "default": "herhangi"
+                },
+                {
+                    "name": "notlar",
+                    "type": "text"
+                },
+                {
+                    "name": "birincil",
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Birincil yetkili mi"
+                },
+                {
+                    "name": "aktif",
+                    "type": "boolean",
+                    "default": true
+                }
+            ]
+        },
+        {
+            "pl_table": "cari_hareket",
+            "description": "Cari hesap borç/alacak hareketleri",
+            "is_master": false,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "cari_kart",
+                        "column": "id",
+                        "on_delete": "RESTRICT"
+                    }
+                },
+                {
+                    "name": "hareket_tarihi",
+                    "type": "date",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "islem_zamani",
+                    "type": "datetime",
+                    "auto_now_add": true
+                },
+                {
+                    "name": "vade_tarihi",
+                    "type": "date",
+                    "indexed": true
+                },
+                {
+                    "name": "hareket_tipi",
+                    "type": "enum",
+                    "values": [
+                        "borc",
+                        "alacak"
+                    ],
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "hareket_turu",
+                    "type": "enum",
+                    "values": [
+                        "satis_fatura",
+                        "alis_fatura",
+                        "tahsilat",
+                        "odeme",
+                        "nakit",
+                        "kredi_karti",
+                        "cek_giris",
+                        "cek_cikis",
+                        "senet_giris",
+                        "senet_cikis",
+                        "iade",
+                        "virman",
+                        "acilis",
+                        "kapalis",
+                        "faiz",
+                        "masraf",
+                        "diger"
+                    ],
+                    "required": true
+                },
+                {
+                    "name": "tutar",
+                    "type": "currency",
+                    "required": true
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "doviz_tutar",
+                    "type": "currency"
+                },
+                {
+                    "name": "doviz_kuru",
+                    "type": "exchange_rate",
+                    "default": 1
+                },
+                {
+                    "name": "kdv_dahil",
+                    "type": "boolean",
+                    "default": true
+                },
+                {
+                    "name": "belge_no",
+                    "type": "document_number",
+                    "indexed": true
+                },
+                {
+                    "name": "belge_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "fis_no",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "referans_no",
+                    "type": "string",
+                    "max_length": 50,
+                    "description": "Harici referans"
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                },
+                {
+                    "name": "kaynak_modul",
+                    "type": "enum",
+                    "values": [
+                        "satis",
+                        "satin_alma",
+                        "finans",
+                        "muhasebe",
+                        "kasa",
+                        "banka",
+                        "cek_senet",
+                        "manuel"
+                    ]
+                },
+                {
+                    "name": "kaynak_tablo",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "kaynak_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "eslesen_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "cari_hareket",
+                        "column": "id",
+                        "on_delete": "SET NULL"
+                    }
+                },
+                {
+                    "name": "kapali",
+                    "type": "boolean",
+                    "default": false,
+                    "indexed": true
+                },
+                {
+                    "name": "kalan_tutar",
+                    "type": "currency",
+                    "description": "Kapatılmayan kalan tutar"
+                },
+                {
+                    "name": "kapama_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "olusturma_tarihi",
+                    "type": "datetime",
+                    "auto_now_add": true
+                }
+            ],
+            "indexes": [
+                {
+                    "name": "idx_hareket_cari_tarih",
+                    "columns": [
+                        "cari_id",
+                        "hareket_tarihi"
+                    ]
+                },
+                {
+                    "name": "idx_hareket_vade",
+                    "columns": [
+                        "vade_tarihi",
+                        "kapali"
+                    ]
+                },
+                {
+                    "name": "idx_hareket_belge",
+                    "columns": [
+                        "belge_no"
+                    ]
+                },
+                {
+                    "name": "idx_hareket_kaynak",
+                    "columns": [
+                        "kaynak_modul",
+                        "kaynak_id"
+                    ]
+                }
+            ]
+        },
+        {
+            "pl_table": "cari_hareket_eslestirme",
+            "description": "Cari hareket eşleştirme detayları",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "borc_hareket_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "cari_hareket",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "alacak_hareket_id",
+                    "type": "bigint",
+                    "required": true,
+                    "foreign_key": {
+                        "table": "cari_hareket",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "eslestirme_tutari",
+                    "type": "currency",
+                    "required": true
+                },
+                {
+                    "name": "eslestirme_tarihi",
+                    "type": "date",
+                    "required": true
+                },
+                {
+                    "name": "aciklama",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "olusturma_tarihi",
+                    "type": "datetime",
+                    "auto_now_add": true
+                }
+            ]
+        },
+        {
+            "pl_table": "cari_risk_tanimi",
+            "description": "Özel risk limit tanımları",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "cari_kart",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "risk_tipi",
+                    "type": "enum",
+                    "values": [
+                        "genel",
+                        "acik_fatura",
+                        "acik_cek",
+                        "toplam_vade",
+                        "vade_asimi"
+                    ],
+                    "required": true
+                },
+                {
+                    "name": "limit_tutari",
+                    "type": "currency",
+                    "required": true
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "uyari_yuzdesi",
+                    "type": "percentage",
+                    "default": 80,
+                    "description": "Uyarı eşiği"
+                },
+                {
+                    "name": "bloke_yuzdesi",
+                    "type": "percentage",
+                    "default": 100,
+                    "description": "Bloke eşiği"
+                },
+                {
+                    "name": "gecerlilik_baslangic",
+                    "type": "date"
+                },
+                {
+                    "name": "gecerlilik_bitis",
+                    "type": "date"
+                },
+                {
+                    "name": "aktif",
+                    "type": "boolean",
+                    "default": true
+                }
+            ]
+        },
+        {
+            "pl_table": "cari_aktivite",
+            "description": "Cari hesap aktivite/etkileşim logları",
+            "is_master": false,
+            "audit": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "cari_kart",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "aktivite_tarihi",
+                    "type": "datetime",
+                    "required": true,
+                    "indexed": true
+                },
+                {
+                    "name": "aktivite_tipi",
+                    "type": "enum",
+                    "values": [
+                        "telefon_gelen",
+                        "telefon_giden",
+                        "email_gelen",
+                        "email_giden",
+                        "toplanti",
+                        "ziyaret",
+                        "teklif",
+                        "sikayet",
+                        "talep",
+                        "not",
+                        "gorev",
+                        "hatirlatma",
+                        "diger"
+                    ],
+                    "required": true
+                },
+                {
+                    "name": "konu",
+                    "type": "string",
+                    "max_length": 200,
+                    "required": true
+                },
+                {
+                    "name": "detay",
+                    "type": "text"
+                },
+                {
+                    "name": "yetkili_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "cari_yetkili",
+                        "column": "id",
+                        "on_delete": "SET NULL"
+                    }
+                },
+                {
+                    "name": "kullanici",
+                    "type": "string",
+                    "max_length": 100,
+                    "required": true
+                },
+                {
+                    "name": "sure_dakika",
+                    "type": "integer",
+                    "description": "Aktivite süresi"
+                },
+                {
+                    "name": "sonuc",
+                    "type": "enum",
+                    "values": [
+                        "basarili",
+                        "beklemede",
+                        "takip_gerekli",
+                        "iptal"
+                    ]
+                },
+                {
+                    "name": "takip_tarihi",
+                    "type": "datetime",
+                    "description": "Takip hatırlatma tarihi"
+                },
+                {
+                    "name": "takip_yapildi",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "onem_derecesi",
+                    "type": "enum",
+                    "values": [
+                        "dusuk",
+                        "normal",
+                        "yuksek",
+                        "kritik"
+                    ],
+                    "default": "normal"
+                },
+                {
+                    "name": "dosya_ekleri",
+                    "type": "json",
+                    "description": "Ek dosya referansları"
+                }
+            ],
+            "indexes": [
+                {
+                    "name": "idx_aktivite_cari_tarih",
+                    "columns": [
+                        "cari_id",
+                        "aktivite_tarihi"
+                    ]
+                },
+                {
+                    "name": "idx_aktivite_takip",
+                    "columns": [
+                        "takip_tarihi",
+                        "takip_yapildi"
+                    ]
+                }
+            ]
+        },
+        {
+            "pl_table": "cari_dosya",
+            "description": "Cari hesap belge/dosya ekleri",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "cari_kart",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "dosya_tipi",
+                    "type": "enum",
+                    "values": [
+                        "sozlesme",
+                        "teklif",
+                        "fatura",
+                        "irsaliye",
+                        "imza_sirkusu",
+                        "vergi_levhasi",
+                        "ticaret_sicil",
+                        "kimlik",
+                        "vekaletname",
+                        "diger"
+                    ],
+                    "required": true
+                },
+                {
+                    "name": "dosya_adi",
+                    "type": "string",
+                    "max_length": 200,
+                    "required": true
+                },
+                {
+                    "name": "dosya_yolu",
+                    "type": "string",
+                    "max_length": 500,
+                    "required": true
+                },
+                {
+                    "name": "dosya_boyutu",
+                    "type": "integer",
+                    "description": "Boyut (byte)"
+                },
+                {
+                    "name": "mime_tipi",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                },
+                {
+                    "name": "gecerlilik_tarihi",
+                    "type": "date",
+                    "description": "Belge geçerlilik tarihi"
+                },
+                {
+                    "name": "yukleyen_kullanici",
+                    "type": "string",
+                    "max_length": 100
+                },
+                {
+                    "name": "yukleme_tarihi",
+                    "type": "datetime",
+                    "auto_now_add": true
+                }
+            ]
+        },
+        {
+            "pl_table": "cari_ozel_fiyat",
+            "description": "Cariye özel fiyat tanımları",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "cari_kart",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "stok_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "description": "Stok kartı referansı"
+                },
+                {
+                    "name": "fiyat_tipi",
+                    "type": "enum",
+                    "values": [
+                        "sabit",
+                        "iskontolu",
+                        "oransal"
+                    ],
+                    "default": "sabit"
+                },
+                {
+                    "name": "fiyat",
+                    "type": "unit_price"
+                },
+                {
+                    "name": "iskonto_orani",
+                    "type": "discount_rate"
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "min_miktar",
+                    "type": "quantity",
+                    "description": "Minimum sipariş miktarı"
+                },
+                {
+                    "name": "gecerlilik_baslangic",
+                    "type": "date"
+                },
+                {
+                    "name": "gecerlilik_bitis",
+                    "type": "date"
+                },
+                {
+                    "name": "oncelik",
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Öncelik sırası"
+                },
+                {
+                    "name": "aktif",
+                    "type": "boolean",
+                    "default": true
+                }
+            ],
+            "indexes": [
+                {
+                    "name": "idx_ozel_fiyat_cari_stok",
+                    "columns": [
+                        "cari_id",
+                        "stok_id"
+                    ]
+                }
+            ]
+        },
+        {
+            "pl_table": "cari_sozlesme",
+            "description": "Cari hesap sözleşmeleri",
+            "is_master": false,
+            "audit": true,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "cari_kart",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "sozlesme_no",
+                    "type": "document_number",
+                    "unique": true,
+                    "required": true
+                },
+                {
+                    "name": "sozlesme_tipi",
+                    "type": "enum",
+                    "values": [
+                        "satis",
+                        "hizmet",
+                        "bakim",
+                        "kiralama",
+                        "distributorluk",
+                        "acentelik",
+                        "diger"
+                    ],
+                    "required": true
+                },
+                {
+                    "name": "sozlesme_adi",
+                    "type": "string",
+                    "max_length": 200,
+                    "required": true
+                },
+                {
+                    "name": "baslangic_tarihi",
+                    "type": "date",
+                    "required": true
+                },
+                {
+                    "name": "bitis_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "otomatik_yenileme",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "yenileme_suresi_ay",
+                    "type": "integer"
+                },
+                {
+                    "name": "sozlesme_tutari",
+                    "type": "currency"
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "fatura_periyodu",
+                    "type": "enum",
+                    "values": [
+                        "aylik",
+                        "3_aylik",
+                        "6_aylik",
+                        "yillik",
+                        "tek_seferlik"
+                    ]
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "taslak",
+                        "aktif",
+                        "askida",
+                        "sonlandirildi",
+                        "iptal"
+                    ],
+                    "default": "taslak"
+                },
+                {
+                    "name": "sartlar",
+                    "type": "text"
+                },
+                {
+                    "name": "notlar",
+                    "type": "text"
+                },
+                {
+                    "name": "dosya_id",
+                    "type": "bigint",
+                    "foreign_key": {
+                        "table": "cari_dosya",
+                        "column": "id",
+                        "on_delete": "SET NULL"
+                    }
+                }
+            ]
+        },
+        {
+            "pl_table": "cari_teminat",
+            "description": "Cari hesap teminatları",
+            "is_master": false,
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "bigint",
+                    "primary_key": true,
+                    "auto_increment": true
+                },
+                {
+                    "name": "cari_id",
+                    "type": "bigint",
+                    "required": true,
+                    "indexed": true,
+                    "foreign_key": {
+                        "table": "cari_kart",
+                        "column": "id",
+                        "on_delete": "CASCADE"
+                    }
+                },
+                {
+                    "name": "teminat_tipi",
+                    "type": "enum",
+                    "values": [
+                        "nakit",
+                        "banka_teminat_mektubu",
+                        "ipotek",
+                        "kefalet",
+                        "cek",
+                        "senet",
+                        "diger"
+                    ],
+                    "required": true
+                },
+                {
+                    "name": "teminat_no",
+                    "type": "string",
+                    "max_length": 50
+                },
+                {
+                    "name": "tutar",
+                    "type": "currency",
+                    "required": true
+                },
+                {
+                    "name": "para_birimi",
+                    "type": "currency_code",
+                    "default": "TRY"
+                },
+                {
+                    "name": "veren_kurum",
+                    "type": "string",
+                    "max_length": 200
+                },
+                {
+                    "name": "baslangic_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "bitis_tarihi",
+                    "type": "date"
+                },
+                {
+                    "name": "durum",
+                    "type": "enum",
+                    "values": [
+                        "aktif",
+                        "suresi_doldu",
+                        "iade_edildi",
+                        "nakde_cevrildi"
+                    ],
+                    "default": "aktif"
+                },
+                {
+                    "name": "aciklama",
+                    "type": "text"
+                }
+            ]
+        }
+    ],
+    "views": [
+        {
+            "name": "cari_bakiye",
+            "description": "Cari hesap güncel bakiye özeti",
+            "base_tables": [
+                "cari_kart",
+                "cari_hareket"
+            ],
+            "columns": [
+                {
+                    "name": "cari_id",
+                    "source": "cari_kart.id"
+                },
+                {
+                    "name": "cari_kodu",
+                    "source": "cari_kart.cari_kodu"
+                },
+                {
+                    "name": "unvan",
+                    "source": "cari_kart.unvan"
+                },
+                {
+                    "name": "cari_tipi",
+                    "source": "cari_kart.cari_tipi"
+                },
+                {
+                    "name": "toplam_borc",
+                    "aggregation": "SUM(borc)"
+                },
+                {
+                    "name": "toplam_alacak",
+                    "aggregation": "SUM(alacak)"
+                },
+                {
+                    "name": "bakiye",
+                    "computed": "toplam_borc - toplam_alacak"
+                },
+                {
+                    "name": "acik_fatura_adedi",
+                    "aggregation": "COUNT(kapali=false)"
+                },
+                {
+                    "name": "son_hareket_tarihi",
+                    "aggregation": "MAX(hareket_tarihi)"
+                }
+            ]
+        },
+        {
+            "name": "cari_vade_analiz",
+            "description": "Vadeli alacak yaşlandırma analizi",
+            "base_tables": [
+                "cari_kart",
+                "cari_hareket"
+            ],
+            "columns": [
+                {
+                    "name": "cari_id",
+                    "source": "cari_kart.id"
+                },
+                {
+                    "name": "unvan",
+                    "source": "cari_kart.unvan"
+                },
+                {
+                    "name": "vadesi_gecmis_90_uzeri",
+                    "aggregation": "90+ gün vadesi geçmiş"
+                },
+                {
+                    "name": "vadesi_gecmis_60_90",
+                    "aggregation": "60-90 gün vadesi geçmiş"
+                },
+                {
+                    "name": "vadesi_gecmis_30_60",
+                    "aggregation": "30-60 gün vadesi geçmiş"
+                },
+                {
+                    "name": "vadesi_gecmis_0_30",
+                    "aggregation": "0-30 gün vadesi geçmiş"
+                },
+                {
+                    "name": "vadesi_gelmemis",
+                    "aggregation": "Vadesi gelmemiş"
+                },
+                {
+                    "name": "toplam_acik",
+                    "computed": "Toplam açık bakiye"
+                }
+            ]
+        },
+        {
+            "name": "cari_risk_durumu",
+            "description": "Risk limit kullanım durumu",
+            "base_tables": [
+                "cari_kart",
+                "cari_hareket",
+                "cari_risk_tanimi"
+            ],
+            "columns": [
+                {
+                    "name": "cari_id",
+                    "source": "cari_kart.id"
+                },
+                {
+                    "name": "unvan",
+                    "source": "cari_kart.unvan"
+                },
+                {
+                    "name": "risk_limiti",
+                    "source": "cari_kart.risk_limiti"
+                },
+                {
+                    "name": "kullanilan_limit",
+                    "aggregation": "Açık bakiye toplamı"
+                },
+                {
+                    "name": "kalan_limit",
+                    "computed": "risk_limiti - kullanilan_limit"
+                },
+                {
+                    "name": "kullanim_orani",
+                    "computed": "(kullanilan_limit / risk_limiti) * 100"
+                },
+                {
+                    "name": "durum",
+                    "computed": "normal/uyari/kritik/bloke"
+                }
+            ]
+        },
+        {
+            "name": "cari_hareket_ozet",
+            "description": "Dönemsel hareket özeti",
+            "base_tables": [
+                "cari_kart",
+                "cari_hareket"
+            ],
+            "columns": [
+                {
+                    "name": "cari_id",
+                    "source": "cari_kart.id"
+                },
+                {
+                    "name": "donem",
+                    "computed": "Yıl-Ay"
+                },
+                {
+                    "name": "borc_tutari",
+                    "aggregation": "SUM(borc)"
+                },
+                {
+                    "name": "alacak_tutari",
+                    "aggregation": "SUM(alacak)"
+                },
+                {
+                    "name": "islem_adedi",
+                    "aggregation": "COUNT(*)"
+                }
+            ]
+        },
+        {
+            "name": "cari_performans",
+            "description": "Müşteri performans metrikleri",
+            "base_tables": [
+                "cari_kart",
+                "cari_hareket",
+                "cari_aktivite"
+            ],
+            "columns": [
+                {
+                    "name": "cari_id",
+                    "source": "cari_kart.id"
+                },
+                {
+                    "name": "unvan",
+                    "source": "cari_kart.unvan"
+                },
+                {
+                    "name": "toplam_ciro",
+                    "aggregation": "Toplam satış tutarı"
+                },
+                {
+                    "name": "ortalama_odeme_suresi",
+                    "aggregation": "Ortalama ödeme günü"
+                },
+                {
+                    "name": "zamaninda_odeme_orani",
+                    "aggregation": "Vadesinde ödeme yüzdesi"
+                },
+                {
+                    "name": "aktivite_sayisi",
+                    "aggregation": "Toplam etkileşim sayısı"
+                },
+                {
+                    "name": "son_aktivite_tarihi",
+                    "aggregation": "MAX(aktivite_tarihi)"
+                }
+            ]
+        }
+    ],
+    "business_rules": [
+        {
+            "code": "CR001",
+            "type": "validation",
+            "description": "Cari kodu benzersiz olmalı"
+        },
+        {
+            "code": "CR002",
+            "type": "warning",
+            "description": "Risk limiti %80 aşıldığında uyarı"
+        },
+        {
+            "code": "CR003",
+            "type": "validation",
+            "description": "Tüzel kişilerde vergi no zorunlu"
+        },
+        {
+            "code": "CR004",
+            "type": "warning",
+            "description": "Vadesi 30+ gün geçmiş alacak varsa uyarı"
+        },
+        {
+            "code": "CR005",
+            "type": "validation",
+            "description": "Blokeli cariye işlem yapılamaz"
+        },
+        {
+            "code": "CR006",
+            "type": "info",
+            "description": "e-Fatura kayıtlı carilerde otomatik e-fatura oluştur"
+        }
+    ]
+}

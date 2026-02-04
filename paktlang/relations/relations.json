@@ -1,0 +1,750 @@
+{
+    "$schema": "paktlang://schema/relations/v1",
+    "$id": "paktlang://relations/core/v1",
+    "version": "1.1.0",
+    "description": "PaktLang çekirdek modülleri arası ilişkiler - Genişletilmiş",
+    "module_dependencies": {
+        "cari": {
+            "depends_on": [],
+            "description": "Temel modül - bağımlılık yok"
+        },
+        "stok": {
+            "depends_on": [],
+            "description": "Temel modül - bağımlılık yok"
+        },
+        "finans": {
+            "depends_on": [
+                "cari"
+            ],
+            "description": "Cari hesaplarla finansal işlemler"
+        },
+        "muhasebe": {
+            "depends_on": [
+                "cari",
+                "finans"
+            ],
+            "description": "Finansal ve cari hesap entegrasyonu"
+        },
+        "satis": {
+            "depends_on": [
+                "cari",
+                "stok",
+                "finans"
+            ],
+            "description": "Müşteri, ürün ve finansal işlemler"
+        },
+        "satin_alma": {
+            "depends_on": [
+                "cari",
+                "stok",
+                "finans"
+            ],
+            "description": "Tedarikçi, ürün ve finansal işlemler"
+        }
+    },
+    "cross_module_relationships": [
+        {
+            "id": "rel_satis_cari",
+            "source": {
+                "module": "satis",
+                "table": "satis_siparis",
+                "column": "cari_id"
+            },
+            "target": {
+                "module": "cari",
+                "table": "cari_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Satış siparişi - Müşteri ilişkisi"
+        },
+        {
+            "id": "rel_satis_fatura_cari",
+            "source": {
+                "module": "satis",
+                "table": "satis_fatura",
+                "column": "cari_id"
+            },
+            "target": {
+                "module": "cari",
+                "table": "cari_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Satış faturası - Müşteri ilişkisi"
+        },
+        {
+            "id": "rel_satis_stok",
+            "source": {
+                "module": "satis",
+                "table": "satis_siparis_kalem",
+                "column": "stok_id"
+            },
+            "target": {
+                "module": "stok",
+                "table": "stok_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Satış kalemi - Stok kartı ilişkisi"
+        },
+        {
+            "id": "rel_satis_depo",
+            "source": {
+                "module": "satis",
+                "table": "satis_irsaliye",
+                "column": "depo_id"
+            },
+            "target": {
+                "module": "stok",
+                "table": "depo",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "İrsaliye - Depo ilişkisi"
+        },
+        {
+            "id": "rel_satinalma_cari",
+            "source": {
+                "module": "satin_alma",
+                "table": "satin_alma_siparis",
+                "column": "tedarikci_id"
+            },
+            "target": {
+                "module": "cari",
+                "table": "cari_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Satınalma siparişi - Tedarikçi ilişkisi"
+        },
+        {
+            "id": "rel_satinalma_fatura_cari",
+            "source": {
+                "module": "satin_alma",
+                "table": "satin_alma_fatura",
+                "column": "tedarikci_id"
+            },
+            "target": {
+                "module": "cari",
+                "table": "cari_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Alış faturası - Tedarikçi ilişkisi"
+        },
+        {
+            "id": "rel_satinalma_stok",
+            "source": {
+                "module": "satin_alma",
+                "table": "satin_alma_siparis_kalem",
+                "column": "stok_id"
+            },
+            "target": {
+                "module": "stok",
+                "table": "stok_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Satınalma kalemi - Stok kartı ilişkisi"
+        },
+        {
+            "id": "rel_satinalma_depo",
+            "source": {
+                "module": "satin_alma",
+                "table": "satin_alma_irsaliye",
+                "column": "depo_id"
+            },
+            "target": {
+                "module": "stok",
+                "table": "depo",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Alış irsaliyesi - Depo ilişkisi"
+        },
+        {
+            "id": "rel_kasa_hareket_cari",
+            "source": {
+                "module": "finans",
+                "table": "kasa_hareket",
+                "column": "cari_id"
+            },
+            "target": {
+                "module": "cari",
+                "table": "cari_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Kasa hareketi - Cari ilişkisi"
+        },
+        {
+            "id": "rel_banka_hareket_cari",
+            "source": {
+                "module": "finans",
+                "table": "banka_hareket",
+                "column": "cari_id"
+            },
+            "target": {
+                "module": "cari",
+                "table": "cari_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Banka hareketi - Cari ilişkisi"
+        },
+        {
+            "id": "rel_cek_senet_cari_borc",
+            "source": {
+                "module": "finans",
+                "table": "cek_senet",
+                "column": "borc_cari_id"
+            },
+            "target": {
+                "module": "cari",
+                "table": "cari_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Çek/senet - Borçlu cari ilişkisi"
+        },
+        {
+            "id": "rel_cek_senet_cari_alacak",
+            "source": {
+                "module": "finans",
+                "table": "cek_senet",
+                "column": "alacak_cari_id"
+            },
+            "target": {
+                "module": "cari",
+                "table": "cari_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Çek/senet - Alacaklı cari ilişkisi"
+        },
+        {
+            "id": "rel_muhasebe_fis_cari",
+            "source": {
+                "module": "muhasebe",
+                "table": "muhasebe_fis_satir",
+                "column": "cari_id"
+            },
+            "target": {
+                "module": "cari",
+                "table": "cari_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Muhasebe fiş satırı - Cari ilişkisi"
+        },
+        {
+            "id": "rel_muhasebe_fis_banka",
+            "source": {
+                "module": "muhasebe",
+                "table": "muhasebe_fis_satir",
+                "column": "banka_hesap_id"
+            },
+            "target": {
+                "module": "finans",
+                "table": "banka_hesap",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Muhasebe fiş satırı - Banka hesabı ilişkisi"
+        },
+        {
+            "id": "rel_cari_hareket_kasa",
+            "source": {
+                "module": "cari",
+                "table": "cari_hareket",
+                "column": "kasa_id"
+            },
+            "target": {
+                "module": "finans",
+                "table": "kasa",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Cari hareket - Kasa ilişkisi"
+        },
+        {
+            "id": "rel_cari_hareket_banka",
+            "source": {
+                "module": "cari",
+                "table": "cari_hareket",
+                "column": "banka_hesap_id"
+            },
+            "target": {
+                "module": "finans",
+                "table": "banka_hesap",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Cari hareket - Banka hesabı ilişkisi"
+        },
+        {
+            "id": "rel_stok_tedarikci_cari",
+            "source": {
+                "module": "stok",
+                "table": "stok_tedarikci",
+                "column": "tedarikci_id"
+            },
+            "target": {
+                "module": "cari",
+                "table": "cari_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Stok tedarikçi - Cari ilişkisi"
+        },
+        {
+            "id": "rel_stok_hareket_depo",
+            "source": {
+                "module": "stok",
+                "table": "stok_hareket",
+                "column": "depo_id"
+            },
+            "target": {
+                "module": "stok",
+                "table": "depo",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Stok hareketi - Depo ilişkisi"
+        },
+        {
+            "id": "rel_stok_hareket_lokasyon",
+            "source": {
+                "module": "stok",
+                "table": "stok_hareket",
+                "column": "lokasyon_id"
+            },
+            "target": {
+                "module": "stok",
+                "table": "depo_lokasyon",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Stok hareketi - Lokasyon ilişkisi"
+        },
+        {
+            "id": "rel_pos_islem_cari",
+            "source": {
+                "module": "finans",
+                "table": "pos_islem",
+                "column": "cari_id"
+            },
+            "target": {
+                "module": "cari",
+                "table": "cari_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "POS işlemi - Cari ilişkisi"
+        },
+        {
+            "id": "rel_satinalma_proje",
+            "source": {
+                "module": "satin_alma",
+                "table": "satin_alma_siparis",
+                "column": "proje_id"
+            },
+            "target": {
+                "module": "muhasebe",
+                "table": "proje",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Satın alma siparişi - Proje ilişkisi"
+        },
+        {
+            "id": "rel_satinalma_maliyet_merkezi",
+            "source": {
+                "module": "satin_alma",
+                "table": "satin_alma_siparis",
+                "column": "maliyet_merkezi_id"
+            },
+            "target": {
+                "module": "muhasebe",
+                "table": "maliyet_merkezi",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Satın alma siparişi - Maliyet merkezi ilişkisi"
+        },
+        {
+            "id": "rel_sabit_kiymet_maliyet_merkezi",
+            "source": {
+                "module": "muhasebe",
+                "table": "sabit_kiymet",
+                "column": "maliyet_merkezi_id"
+            },
+            "target": {
+                "module": "muhasebe",
+                "table": "maliyet_merkezi",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Sabit kıymet - Maliyet merkezi ilişkisi"
+        },
+        {
+            "id": "rel_tedarikci_degerlendirme_cari",
+            "source": {
+                "module": "satin_alma",
+                "table": "tedarikci_degerlendirme",
+                "column": "tedarikci_id"
+            },
+            "target": {
+                "module": "cari",
+                "table": "cari_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Tedarikçi değerlendirmesi - Cari ilişkisi"
+        },
+        {
+            "id": "rel_cari_ozel_fiyat_stok",
+            "source": {
+                "module": "cari",
+                "table": "cari_ozel_fiyat",
+                "column": "stok_id"
+            },
+            "target": {
+                "module": "stok",
+                "table": "stok_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Cari özel fiyat - Stok ilişkisi"
+        },
+        {
+            "id": "rel_kampanya_stok",
+            "source": {
+                "module": "satis",
+                "table": "kampanya_urun",
+                "column": "stok_id"
+            },
+            "target": {
+                "module": "stok",
+                "table": "stok_kart",
+                "column": "id"
+            },
+            "type": "many_to_one",
+            "description": "Kampanya ürünü - Stok ilişkisi"
+        }
+    ],
+    "data_flows": [
+        {
+            "id": "flow_satis_siparis_fatura",
+            "name": "Satış sipariş-irsaliye-fatura akışı",
+            "steps": [
+                {
+                    "module": "satis",
+                    "table": "satis_siparis",
+                    "action": "create"
+                },
+                {
+                    "module": "satis",
+                    "table": "satis_irsaliye",
+                    "action": "create"
+                },
+                {
+                    "module": "stok",
+                    "table": "stok_hareket",
+                    "action": "create"
+                },
+                {
+                    "module": "satis",
+                    "table": "satis_fatura",
+                    "action": "create"
+                },
+                {
+                    "module": "cari",
+                    "table": "cari_hareket",
+                    "action": "create"
+                },
+                {
+                    "module": "muhasebe",
+                    "table": "muhasebe_fis",
+                    "action": "create"
+                }
+            ]
+        },
+        {
+            "id": "flow_satinalma_siparis_fatura",
+            "name": "Satın alma sipariş-irsaliye-fatura akışı",
+            "steps": [
+                {
+                    "module": "satin_alma",
+                    "table": "satin_alma_talep",
+                    "action": "create"
+                },
+                {
+                    "module": "satin_alma",
+                    "table": "tedarikci_teklif_talebi",
+                    "action": "create"
+                },
+                {
+                    "module": "satin_alma",
+                    "table": "tedarikci_teklif",
+                    "action": "receive"
+                },
+                {
+                    "module": "satin_alma",
+                    "table": "satin_alma_siparis",
+                    "action": "create"
+                },
+                {
+                    "module": "satin_alma",
+                    "table": "satin_alma_irsaliye",
+                    "action": "receive"
+                },
+                {
+                    "module": "stok",
+                    "table": "stok_hareket",
+                    "action": "create"
+                },
+                {
+                    "module": "satin_alma",
+                    "table": "satin_alma_fatura",
+                    "action": "create"
+                },
+                {
+                    "module": "cari",
+                    "table": "cari_hareket",
+                    "action": "create"
+                },
+                {
+                    "module": "muhasebe",
+                    "table": "muhasebe_fis",
+                    "action": "create"
+                }
+            ]
+        },
+        {
+            "id": "flow_tahsilat",
+            "name": "Cari tahsilat akışı",
+            "steps": [
+                {
+                    "module": "finans",
+                    "table": "kasa_hareket",
+                    "action": "create"
+                },
+                {
+                    "module": "cari",
+                    "table": "cari_hareket",
+                    "action": "create"
+                },
+                {
+                    "module": "cari",
+                    "table": "cari_hareket_eslestirme",
+                    "action": "match"
+                },
+                {
+                    "module": "muhasebe",
+                    "table": "muhasebe_fis",
+                    "action": "create"
+                }
+            ]
+        },
+        {
+            "id": "flow_odeme",
+            "name": "Cari ödeme akışı",
+            "steps": [
+                {
+                    "module": "finans",
+                    "table": "banka_hareket",
+                    "action": "create"
+                },
+                {
+                    "module": "cari",
+                    "table": "cari_hareket",
+                    "action": "create"
+                },
+                {
+                    "module": "cari",
+                    "table": "cari_hareket_eslestirme",
+                    "action": "match"
+                },
+                {
+                    "module": "muhasebe",
+                    "table": "muhasebe_fis",
+                    "action": "create"
+                }
+            ]
+        },
+        {
+            "id": "flow_cek_tahsil",
+            "name": "Çek tahsil akışı",
+            "steps": [
+                {
+                    "module": "finans",
+                    "table": "cek_senet",
+                    "action": "receive"
+                },
+                {
+                    "module": "finans",
+                    "table": "cek_senet_hareket",
+                    "action": "log"
+                },
+                {
+                    "module": "finans",
+                    "table": "cek_senet",
+                    "action": "send_to_bank"
+                },
+                {
+                    "module": "finans",
+                    "table": "banka_hareket",
+                    "action": "receive"
+                },
+                {
+                    "module": "cari",
+                    "table": "cari_hareket",
+                    "action": "close"
+                },
+                {
+                    "module": "muhasebe",
+                    "table": "muhasebe_fis",
+                    "action": "create"
+                }
+            ]
+        },
+        {
+            "id": "flow_stok_transfer",
+            "name": "Depolar arası stok transferi",
+            "steps": [
+                {
+                    "module": "stok",
+                    "table": "stok_transfer",
+                    "action": "create"
+                },
+                {
+                    "module": "stok",
+                    "table": "stok_transfer_detay",
+                    "action": "create"
+                },
+                {
+                    "module": "stok",
+                    "table": "stok_hareket",
+                    "action": "create_out"
+                },
+                {
+                    "module": "stok",
+                    "table": "stok_hareket",
+                    "action": "create_in"
+                },
+                {
+                    "module": "stok",
+                    "table": "stok_bakiye",
+                    "action": "update"
+                }
+            ]
+        },
+        {
+            "id": "flow_stok_sayim",
+            "name": "Stok sayım akışı",
+            "steps": [
+                {
+                    "module": "stok",
+                    "table": "stok_sayim",
+                    "action": "create"
+                },
+                {
+                    "module": "stok",
+                    "table": "stok_sayim_detay",
+                    "action": "count"
+                },
+                {
+                    "module": "stok",
+                    "table": "stok_hareket",
+                    "action": "adjust"
+                },
+                {
+                    "module": "stok",
+                    "table": "stok_bakiye",
+                    "action": "update"
+                },
+                {
+                    "module": "muhasebe",
+                    "table": "muhasebe_fis",
+                    "action": "create"
+                }
+            ]
+        }
+    ],
+    "referential_integrity_rules": [
+        {
+            "rule_id": "RI001",
+            "description": "Cari kartı silindiğinde ilişkili kayıtlar korunur",
+            "source_table": "cari_kart",
+            "affected_tables": [
+                "satis_siparis",
+                "satis_fatura",
+                "satin_alma_siparis",
+                "cari_hareket"
+            ],
+            "action": "RESTRICT"
+        },
+        {
+            "rule_id": "RI002",
+            "description": "Stok kartı silindiğinde ilişkili kayıtlar korunur",
+            "source_table": "stok_kart",
+            "affected_tables": [
+                "satis_siparis_kalem",
+                "satin_alma_siparis_kalem",
+                "stok_hareket"
+            ],
+            "action": "RESTRICT"
+        },
+        {
+            "rule_id": "RI003",
+            "description": "Depo silindiğinde stok bakiyeleri korunur",
+            "source_table": "depo",
+            "affected_tables": [
+                "stok_bakiye",
+                "stok_hareket"
+            ],
+            "action": "RESTRICT"
+        },
+        {
+            "rule_id": "RI004",
+            "description": "Kasa silindiğinde hareketler korunur",
+            "source_table": "kasa",
+            "affected_tables": [
+                "kasa_hareket"
+            ],
+            "action": "RESTRICT"
+        },
+        {
+            "rule_id": "RI005",
+            "description": "Banka hesabı silindiğinde hareketler korunur",
+            "source_table": "banka_hesap",
+            "affected_tables": [
+                "banka_hareket",
+                "cek_senet"
+            ],
+            "action": "RESTRICT"
+        },
+        {
+            "rule_id": "RI006",
+            "description": "Muhasebe hesabı silindiğinde fişler korunur",
+            "source_table": "hesap_plani",
+            "affected_tables": [
+                "muhasebe_fis_satir",
+                "hesap_bakiye"
+            ],
+            "action": "RESTRICT"
+        },
+        {
+            "rule_id": "RI007",
+            "description": "Dönem silindiğinde fişler korunur",
+            "source_table": "donem",
+            "affected_tables": [
+                "muhasebe_fis",
+                "hesap_bakiye"
+            ],
+            "action": "RESTRICT"
+        }
+    ]
+}

@@ -1,0 +1,139 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "paktlang://meta/v1",
+    "paktlang_version": "1.0.0",
+    "name": "PaktLang",
+    "description": "ERP veritabanı yapılarını Pakt ekosisteminin anlayacağı ortak, standart ve versiyonlanabilir şema dili",
+    "metadata": {
+        "created_at": "2026-02-03",
+        "author": "Pakt Team",
+        "license": "Proprietary"
+    },
+    "schema_structure": {
+        "meta_layer": {
+            "description": "Şema versiyonu, desteklenen tipler, genel kurallar",
+            "files": [
+                "paktlang.meta.json",
+                "base_types.json",
+                "erp_types.json"
+            ]
+        },
+        "module_layer": {
+            "description": "Çekirdek ve opsiyonel modül tanımları",
+            "location": "modules/"
+        },
+        "relation_layer": {
+            "description": "Modüller arası ilişki tanımları",
+            "location": "relations/"
+        },
+        "mapping_layer": {
+            "description": "ERP sistemleri ile tablo/alan eşleştirmeleri",
+            "location": "mappings/",
+            "files": [
+                "erp_mappings.json"
+            ]
+        }
+    },
+    "core_modules": [
+        {
+            "name": "cari",
+            "description": "Müşteri ve tedarikçi cari hesap yönetimi",
+            "priority": "high",
+            "status": "active"
+        },
+        {
+            "name": "finans",
+            "description": "Finansal hareketler, kasa ve banka işlemleri",
+            "priority": "high",
+            "status": "active"
+        },
+        {
+            "name": "muhasebe",
+            "description": "Hesap planı ve muhasebe fişleri",
+            "priority": "high",
+            "status": "active"
+        },
+        {
+            "name": "stok",
+            "description": "Stok kartları, depo ve hareket yönetimi",
+            "priority": "medium",
+            "status": "active"
+        },
+        {
+            "name": "satis",
+            "description": "Satış siparişleri, irsaliye ve faturalar",
+            "priority": "medium",
+            "status": "active"
+        },
+        {
+            "name": "satin_alma",
+            "description": "Satın alma siparişleri ve tedarik yönetimi",
+            "priority": "medium",
+            "status": "active"
+        }
+    ],
+    "optional_modules": [
+        {
+            "name": "uretim",
+            "description": "Üretim reçeteleri ve iş emirleri",
+            "priority": "low",
+            "status": "planned"
+        },
+        {
+            "name": "ik",
+            "description": "İnsan kaynakları ve personel yönetimi",
+            "priority": "low",
+            "status": "planned"
+        },
+        {
+            "name": "crm",
+            "description": "Müşteri ilişkileri yönetimi",
+            "priority": "low",
+            "status": "planned"
+        }
+    ],
+    "versioning": {
+        "strategy": "semantic",
+        "format": "MAJOR.MINOR.PATCH",
+        "rules": {
+            "major": "Geriye uyumsuz şema değişiklikleri",
+            "minor": "Geriye uyumlu yeni özellikler",
+            "patch": "Geriye uyumlu hata düzeltmeleri"
+        }
+    },
+    "validation": {
+        "levels": [
+            "syntax",
+            "schema",
+            "semantic",
+            "cross_module"
+        ],
+        "strict_mode": true,
+        "error_prefix": "PL"
+    },
+    "supported_erp_systems": [
+        {
+            "name": "Logo",
+            "versions": [
+                "Tiger 3",
+                "Go 3"
+            ],
+            "status": "planned"
+        },
+        {
+            "name": "Akınsoft",
+            "versions": [
+                "Wolvox"
+            ],
+            "status": "planned"
+        },
+        {
+            "name": "Netsis",
+            "versions": [
+                "Standard",
+                "Enterprise"
+            ],
+            "status": "planned"
+        }
+    ]
+}

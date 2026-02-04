@@ -1,0 +1,401 @@
+{
+    "$schema": "paktlang://meta/types/v1",
+    "$id": "paktlang://types/base/v1",
+    "version": "1.0.0",
+    "description": "PaktLang temel veri tipleri tanımları",
+    "base_types": {
+        "integer": {
+            "description": "Tam sayı değeri",
+            "sql_mappings": {
+                "postgresql": "INTEGER",
+                "mysql": "INT",
+                "mssql": "INT",
+                "sqlite": "INTEGER"
+            },
+            "constraints": {
+                "min": {
+                    "type": "integer",
+                    "description": "Minimum değer"
+                },
+                "max": {
+                    "type": "integer",
+                    "description": "Maksimum değer"
+                },
+                "auto_increment": {
+                    "type": "boolean",
+                    "description": "Otomatik artış",
+                    "default": false
+                }
+            },
+            "validations": {
+                "nullable": true,
+                "default_allowed": true
+            }
+        },
+        "bigint": {
+            "description": "Büyük tam sayı değeri",
+            "sql_mappings": {
+                "postgresql": "BIGINT",
+                "mysql": "BIGINT",
+                "mssql": "BIGINT",
+                "sqlite": "INTEGER"
+            },
+            "constraints": {
+                "min": {
+                    "type": "integer"
+                },
+                "max": {
+                    "type": "integer"
+                },
+                "auto_increment": {
+                    "type": "boolean",
+                    "default": false
+                }
+            },
+            "validations": {
+                "nullable": true,
+                "default_allowed": true
+            }
+        },
+        "decimal": {
+            "description": "Ondalıklı sayı değeri",
+            "sql_mappings": {
+                "postgresql": "DECIMAL({precision},{scale})",
+                "mysql": "DECIMAL({precision},{scale})",
+                "mssql": "DECIMAL({precision},{scale})",
+                "sqlite": "REAL"
+            },
+            "constraints": {
+                "precision": {
+                    "type": "integer",
+                    "description": "Toplam basamak sayısı",
+                    "min": 1,
+                    "max": 38,
+                    "default": 18
+                },
+                "scale": {
+                    "type": "integer",
+                    "description": "Ondalık basamak sayısı",
+                    "min": 0,
+                    "max": 18,
+                    "default": 2
+                },
+                "min": {
+                    "type": "number"
+                },
+                "max": {
+                    "type": "number"
+                }
+            },
+            "validations": {
+                "nullable": true,
+                "default_allowed": true
+            }
+        },
+        "string": {
+            "description": "Sabit uzunluklu metin değeri",
+            "sql_mappings": {
+                "postgresql": "VARCHAR({max_length})",
+                "mysql": "VARCHAR({max_length})",
+                "mssql": "NVARCHAR({max_length})",
+                "sqlite": "TEXT"
+            },
+            "constraints": {
+                "max_length": {
+                    "type": "integer",
+                    "description": "Maksimum karakter sayısı",
+                    "min": 1,
+                    "max": 10000,
+                    "required": true
+                },
+                "min_length": {
+                    "type": "integer",
+                    "description": "Minimum karakter sayısı",
+                    "min": 0,
+                    "default": 0
+                },
+                "pattern": {
+                    "type": "string",
+                    "description": "Regex deseni"
+                },
+                "trim": {
+                    "type": "boolean",
+                    "description": "Baş/son boşlukları temizle",
+                    "default": true
+                }
+            },
+            "validations": {
+                "nullable": true,
+                "default_allowed": true,
+                "empty_string_allowed": true
+            }
+        },
+        "text": {
+            "description": "Uzun metin değeri (sınırsız)",
+            "sql_mappings": {
+                "postgresql": "TEXT",
+                "mysql": "LONGTEXT",
+                "mssql": "NVARCHAR(MAX)",
+                "sqlite": "TEXT"
+            },
+            "constraints": {
+                "max_length": {
+                    "type": "integer",
+                    "description": "Maksimum karakter sayısı (opsiyonel)"
+                }
+            },
+            "validations": {
+                "nullable": true,
+                "default_allowed": true
+            }
+        },
+        "boolean": {
+            "description": "Mantıksal doğru/yanlış değeri",
+            "sql_mappings": {
+                "postgresql": "BOOLEAN",
+                "mysql": "TINYINT(1)",
+                "mssql": "BIT",
+                "sqlite": "INTEGER"
+            },
+            "constraints": {
+                "default": {
+                    "type": "boolean",
+                    "description": "Varsayılan değer"
+                }
+            },
+            "validations": {
+                "nullable": true,
+                "default_allowed": true
+            }
+        },
+        "date": {
+            "description": "Tarih değeri (saat hariç)",
+            "sql_mappings": {
+                "postgresql": "DATE",
+                "mysql": "DATE",
+                "mssql": "DATE",
+                "sqlite": "TEXT"
+            },
+            "format": "YYYY-MM-DD",
+            "constraints": {
+                "min_date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Minimum tarih"
+                },
+                "max_date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Maksimum tarih"
+                }
+            },
+            "validations": {
+                "nullable": true,
+                "default_allowed": true,
+                "special_defaults": [
+                    "CURRENT_DATE"
+                ]
+            }
+        },
+        "datetime": {
+            "description": "Tarih ve saat değeri",
+            "sql_mappings": {
+                "postgresql": "TIMESTAMP",
+                "mysql": "DATETIME",
+                "mssql": "DATETIME2",
+                "sqlite": "TEXT"
+            },
+            "format": "YYYY-MM-DD HH:mm:ss",
+            "constraints": {
+                "min_date": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "max_date": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "timezone": {
+                    "type": "boolean",
+                    "description": "Timezone bilgisi içerir mi",
+                    "default": false
+                },
+                "auto_now": {
+                    "type": "boolean",
+                    "description": "Her güncellmede otomatik şimdiki zaman",
+                    "default": false
+                },
+                "auto_now_add": {
+                    "type": "boolean",
+                    "description": "Oluşturmada otomatik şimdiki zaman",
+                    "default": false
+                }
+            },
+            "validations": {
+                "nullable": true,
+                "default_allowed": true,
+                "special_defaults": [
+                    "CURRENT_TIMESTAMP"
+                ]
+            }
+        },
+        "time": {
+            "description": "Saat değeri (tarih hariç)",
+            "sql_mappings": {
+                "postgresql": "TIME",
+                "mysql": "TIME",
+                "mssql": "TIME",
+                "sqlite": "TEXT"
+            },
+            "format": "HH:mm:ss",
+            "constraints": {},
+            "validations": {
+                "nullable": true,
+                "default_allowed": true
+            }
+        },
+        "enum": {
+            "description": "Sabit değer listesinden seçim",
+            "sql_mappings": {
+                "postgresql": "VARCHAR(100)",
+                "mysql": "ENUM({values})",
+                "mssql": "NVARCHAR(100)",
+                "sqlite": "TEXT"
+            },
+            "constraints": {
+                "values": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "İzin verilen değerler listesi",
+                    "required": true,
+                    "min_items": 1
+                }
+            },
+            "validations": {
+                "nullable": true,
+                "default_allowed": true,
+                "default_must_be_in_values": true
+            }
+        },
+        "json": {
+            "description": "JSON veri yapısı",
+            "sql_mappings": {
+                "postgresql": "JSONB",
+                "mysql": "JSON",
+                "mssql": "NVARCHAR(MAX)",
+                "sqlite": "TEXT"
+            },
+            "constraints": {
+                "schema": {
+                    "type": "object",
+                    "description": "JSON Schema tanımı (opsiyonel)"
+                }
+            },
+            "validations": {
+                "nullable": true,
+                "default_allowed": true
+            }
+        },
+        "uuid": {
+            "description": "Evrensel benzersiz tanımlayıcı (UUID v4)",
+            "sql_mappings": {
+                "postgresql": "UUID",
+                "mysql": "CHAR(36)",
+                "mssql": "UNIQUEIDENTIFIER",
+                "sqlite": "TEXT"
+            },
+            "format": "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx",
+            "constraints": {
+                "auto_generate": {
+                    "type": "boolean",
+                    "description": "Otomatik UUID üretimi",
+                    "default": false
+                }
+            },
+            "validations": {
+                "nullable": true,
+                "default_allowed": true
+            }
+        },
+        "binary": {
+            "description": "İkili (binary) veri",
+            "sql_mappings": {
+                "postgresql": "BYTEA",
+                "mysql": "LONGBLOB",
+                "mssql": "VARBINARY(MAX)",
+                "sqlite": "BLOB"
+            },
+            "constraints": {
+                "max_size": {
+                    "type": "integer",
+                    "description": "Maksimum boyut (byte)"
+                }
+            },
+            "validations": {
+                "nullable": true,
+                "default_allowed": false
+            }
+        }
+    },
+    "column_properties": {
+        "primary_key": {
+            "type": "boolean",
+            "description": "Birincil anahtar mı",
+            "default": false
+        },
+        "unique": {
+            "type": "boolean",
+            "description": "Benzersiz değer kısıtlaması",
+            "default": false
+        },
+        "required": {
+            "type": "boolean",
+            "description": "Zorunlu alan (NOT NULL)",
+            "default": false
+        },
+        "indexed": {
+            "type": "boolean",
+            "description": "İndekslenmiş alan",
+            "default": false
+        },
+        "default": {
+            "description": "Varsayılan değer"
+        },
+        "foreign_key": {
+            "type": "object",
+            "description": "Yabancı anahtar tanımı",
+            "properties": {
+                "table": {
+                    "type": "string"
+                },
+                "column": {
+                    "type": "string"
+                },
+                "on_delete": {
+                    "type": "string",
+                    "enum": [
+                        "CASCADE",
+                        "SET NULL",
+                        "RESTRICT",
+                        "NO ACTION"
+                    ]
+                },
+                "on_update": {
+                    "type": "string",
+                    "enum": [
+                        "CASCADE",
+                        "SET NULL",
+                        "RESTRICT",
+                        "NO ACTION"
+                    ]
+                }
+            }
+        },
+        "description": {
+            "type": "string",
+            "description": "Kolon açıklaması"
+        }
+    }
+}

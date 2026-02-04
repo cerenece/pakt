@@ -1,0 +1,281 @@
+{
+    "$schema": "paktlang://schema/mapping/v1",
+    "$id": "paktlang://mappings/erp/v1",
+    "version": "1.0.0",
+    "description": "ERP sistemleri için tablo ve alan eşleştirmeleri",
+    "mapping_info": {
+        "purpose": "PaktLang yapılarını farklı ERP sistemlerinin veritabanı yapılarına eşleştirir",
+        "supported_erp_systems": [
+            "netsis",
+            "logo",
+            "mikro",
+            "wolvox"
+        ],
+        "bidirectional": true
+    },
+    "netsis": {
+        "version": "Standard/Enterprise",
+        "table_prefix": "TBL",
+        "modules": {
+            "stok": {
+                "stok_kart": {
+                    "erp_table": "TBLSTKART",
+                    "field_mappings": {
+                        "stok_kodu": "STKKOD",
+                        "stok_adi": "STKCINSI",
+                        "barkod": "BARKOD1",
+                        "birim": "BIRIM",
+                        "kdv_orani": "KDV",
+                        "alis_fiyati": "ALISFIYAT",
+                        "satis_fiyati": "SATISFIYAT"
+                    }
+                },
+                "stok_hareket": {
+                    "erp_table": "TBLSTHAR",
+                    "field_mappings": {
+                        "stok_kodu": "STHAR_STKKOD",
+                        "miktar": "STHAR_MIKTAR",
+                        "birim_fiyat": "STHAR_BFIYAT",
+                        "depo_kodu": "STHAR_DEPOKOD",
+                        "belge_no": "STHAR_EVESSION",
+                        "belge_tarihi": "STHAR_TARIH",
+                        "fatura_no": "STHAR_FESSION",
+                        "irsaliye_no": "STHAR_IESSION"
+                    },
+                    "special_fields": {
+                        "belge_tipi_kod": {
+                            "erp_field": "STHAR_FTIRSIP",
+                            "type": "enum_code",
+                            "mappings": {
+                                "1": "satis_fatura",
+                                "2": "alis_fatura",
+                                "3": "satis_irsaliye",
+                                "4": "alis_irsaliye",
+                                "6": "musteri_siparis",
+                                "7": "satici_siparis",
+                                "8": "dat_giris",
+                                "9": "dat_cikis",
+                                "A": "saklanmis_irsaliye"
+                            }
+                        },
+                        "hareket_turu_kod": {
+                            "erp_field": "STHAR_HTUR",
+                            "type": "enum_code",
+                            "mappings": {
+                                "A": "devir",
+                                "B": "depolar_arasi_transfer",
+                                "C": "uretim",
+                                "D": "muhtelif",
+                                "E": "miktarsiz_maliyet",
+                                "F": "konsinye",
+                                "G": "mustahsil",
+                                "H": "irsaliye_tipli",
+                                "I": "kapali_fatura",
+                                "J": "acik_fatura",
+                                "K": "muhtelif_musteri",
+                                "L": "iade",
+                                "M": "zayi_iade"
+                            }
+                        },
+                        "kaynak_belge_tipi": {
+                            "erp_field": "STHAR_BGTIP",
+                            "type": "enum_code",
+                            "mappings": {
+                                "F": "fatura",
+                                "I": "irsaliye"
+                            }
+                        },
+                        "siparis_no": {
+                            "erp_field": "STHAR_SIPNUM",
+                            "nullable_means": "siparis_baglantisi_yok"
+                        }
+                    }
+                }
+            },
+            "cari": {
+                "cari_kart": {
+                    "erp_table": "TBLCARI",
+                    "field_mappings": {
+                        "cari_kodu": "CA_KOD",
+                        "unvan": "CA_UNVAN",
+                        "vergi_no": "CA_VERGINO",
+                        "vergi_dairesi": "CA_VERGIDAIRE",
+                        "telefon": "CA_TEL1",
+                        "email": "CA_EMAIL"
+                    }
+                },
+                "cari_hareket": {
+                    "erp_table": "TBLCAHAR",
+                    "field_mappings": {
+                        "cari_kodu": "CAESSION",
+                        "borc": "BORC",
+                        "alacak": "ALACAK",
+                        "tarih": "CAHAR_TARIH"
+                    }
+                }
+            },
+            "fatura": {
+                "fatura_header": {
+                    "erp_table": "TBLFATUIRS",
+                    "field_mappings": {
+                        "fatura_no": "FATIRSNO",
+                        "cari_kodu": "FAIRS_CAESSION",
+                        "toplam_tutar": "FAIRS_GTUTAR"
+                    }
+                }
+            }
+        }
+    },
+    "logo": {
+        "version": "Tiger 3 / Go 3",
+        "table_prefix": "LG_{FIRMA}_",
+        "firma_code_format": "XXX",
+        "modules": {
+            "stok": {
+                "stok_kart": {
+                    "erp_table": "LG_{FIRMA}_ITEMS",
+                    "field_mappings": {
+                        "stok_kodu": "CODE",
+                        "stok_adi": "NAME",
+                        "barkod": "BARCODE",
+                        "birim_id": "UNITSETREF"
+                    }
+                },
+                "stok_hareket": {
+                    "erp_table": "LG_{FIRMA}_STLINE",
+                    "field_mappings": {
+                        "stok_id": "STOCKREF",
+                        "miktar": "AMOUNT",
+                        "birim_fiyat": "PRICE",
+                        "depo_kodu": "SOURCEINDEX"
+                    },
+                    "special_fields": {
+                        "hareket_tipi": {
+                            "erp_field": "IOCODE",
+                            "mappings": {
+                                "1": "giris",
+                                "2": "cikis",
+                                "3": "giris",
+                                "4": "cikis"
+                            }
+                        },
+                        "hareket_turu": {
+                            "erp_field": "TRCODE",
+                            "mappings": {
+                                "1": "alis",
+                                "2": "perakende_satis",
+                                "3": "toptan_satis",
+                                "4": "konsinye_giris",
+                                "5": "konsinye_cikis",
+                                "6": "mustahsil",
+                                "7": "perakende_iade",
+                                "8": "toptan_iade",
+                                "11": "fire",
+                                "12": "sarf",
+                                "13": "uretimden_giris",
+                                "14": "uretime_cikis",
+                                "25": "transfer"
+                            }
+                        }
+                    }
+                }
+            },
+            "cari": {
+                "cari_kart": {
+                    "erp_table": "LG_{FIRMA}_CLCARD",
+                    "field_mappings": {
+                        "cari_kodu": "CODE",
+                        "unvan": "DEFINITION_",
+                        "vergi_no": "TAXNR"
+                    }
+                }
+            },
+            "doviz": {
+                "doviz_kuru": {
+                    "erp_table": "LG_EXCHANGE",
+                    "field_mappings": {
+                        "tarih": "DATE_",
+                        "kur": "RATES1"
+                    }
+                }
+            }
+        }
+    },
+    "mikro": {
+        "version": "Mikro Jump / Classic",
+        "table_prefix": "",
+        "modules": {
+            "stok": {
+                "stok_kart": {
+                    "erp_table": "STOK",
+                    "field_mappings": {
+                        "stok_kodu": "sto_kod",
+                        "stok_adi": "sto_isim",
+                        "barkod": "sto_barkod1"
+                    }
+                }
+            },
+            "cari": {
+                "cari_kart": {
+                    "erp_table": "CARI_HESAPLAR",
+                    "field_mappings": {
+                        "cari_kodu": "cari_kod",
+                        "unvan": "cari_unvan"
+                    }
+                }
+            }
+        }
+    },
+    "wolvox": {
+        "version": "Akınsoft Wolvox",
+        "table_prefix": "",
+        "modules": {
+            "stok": {
+                "stok_kart": {
+                    "erp_table": "TB_STOK",
+                    "field_mappings": {
+                        "stok_kodu": "STK_KOD",
+                        "stok_adi": "STK_AD"
+                    }
+                }
+            },
+            "cari": {
+                "cari_kart": {
+                    "erp_table": "TB_CARI",
+                    "field_mappings": {
+                        "cari_kodu": "CRI_KOD",
+                        "unvan": "CRI_AD"
+                    }
+                }
+            }
+        }
+    },
+    "conversion_rules": {
+        "date_formats": {
+            "paktlang": "YYYY-MM-DD",
+            "netsis": "YYYY-MM-DD",
+            "logo": "YYYY-MM-DD HH:mm:ss",
+            "mikro": "DD.MM.YYYY"
+        },
+        "decimal_separators": {
+            "paktlang": ".",
+            "netsis": ".",
+            "logo": ".",
+            "mikro": ","
+        },
+        "boolean_mappings": {
+            "netsis": {
+                "true": 1,
+                "false": 0
+            },
+            "logo": {
+                "true": 1,
+                "false": 0
+            },
+            "mikro": {
+                "true": "E",
+                "false": "H"
+            }
+        }
+    }
+}
