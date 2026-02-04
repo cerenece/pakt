@@ -2,7 +2,7 @@
     "$schema": "paktlang://schema/relations/v1",
     "$id": "paktlang://relations/core/v1",
     "version": "1.1.0",
-    "description": "PaktLang çekirdek modülleri arası ilişkiler - Genişletilmiş",
+    "description": "PaktLang çekirdek modülleri arası ilişkiler",
     "module_dependencies": {
         "cari": {
             "depends_on": [],
