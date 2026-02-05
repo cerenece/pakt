@@ -1,81 +1,110 @@
 # PaktLang
 
-ERP veritabanı yapılarını Pakt ekosisteminin anlayacağı ortak, standart ve versiyonlanabilir şema dili.
+ERP veritabanlarına erişim haritası - farklı ERP sistemlerini ortak bir dilde tanımlayan şema.
 
 ## 🎯 Nedir?
 
-PaktLang, farklı ERP sistemlerinin (Logo, Netsis, Mikro, Wolvox) veritabanı yapılarını tek bir standart dilde tanımlayan JSON tabanlı bir şema dilidir.
+PaktLang (PL), farklı ERP sistemlerinin (Logo, Netsis, Akınsoft, Mikro) veritabanlarına **nasıl ulaşılacağını** tanımlayan bir harita dilidir.
 
-## 🚀 Hızlı Başlangıç
+> **Önemli:** PL veriyi taşımaz, dönüştürmez. Sadece ERP veritabanını **adresler**.
 
-```bash
-# Şema validasyonu
-python validator/schema_validator.py --all modules/core
+### Harita Mantığı
 
-# Tek modül validasyonu
-python validator/schema_validator.py modules/core/stok.json
+```
+Kullanıcı: "Stok kartlarını getir"
+    ↓
+Sistem: PL'de stok_kart → Netsis'te TBLSTSABIT
+    ↓
+SQL: SELECT * FROM TBLSTSABIT
 ```
 
 ## 📁 Proje Yapısı
 
 ```
 paktlang/
-├── meta/                 # Tip tanımları ve meta bilgiler
-│   ├── paktlang.meta.json
-│   ├── base_types.json   # Temel veri tipleri
-│   └── erp_types.json    # ERP özel tipleri
-├── modules/core/         # Ana modüller
-│   ├── cari.json         # Müşteri/Tedarikçi
-│   ├── stok.json         # Stok yönetimi
-│   ├── satis.json        # Satış işlemleri
-│   ├── satin_alma.json   # Satın alma
-│   ├── finans.json       # Finans/Kasa/Banka
-│   └── muhasebe.json     # Muhasebe
-├── relations/            # Modüller arası ilişkiler
-│   └── relations.json
-├── mappings/             # ERP eşleştirmeleri
-│   └── erp_mappings.json
-├── validator/            # Şema doğrulama aracı
-│   └── schema_validator.py
-└── docs/                 # Dokümantasyon
+├── modules/core/         # Ana modül iskeletleri
+│   └── stok.json         # Stok modülü
+├── mappings/             # ERP eşleştirmeleri (TODO)
+├── meta/                 # Tip tanımları
+└── validator/            # Şema doğrulama
 ```
 
-## 📦 Modüller
+## 🗺️ Şema Yapısı
 
-| Modül | Açıklama | Durum |
-|-------|----------|-------|
-| cari | Müşteri ve tedarikçi hesapları | ✅ Aktif |
-| stok | Stok kartları, depolar, hareketler | ✅ Aktif |
-| satis | Siparişler, irsaliyeler, faturalar | ✅ Aktif |
-| satin_alma | Satın alma siparişleri, tedarik | ✅ Aktif |
-| finans | Kasa, banka, ödeme/tahsilat | ✅ Aktif |
-| muhasebe | Hesap planı, muhasebe fişleri | ✅ Aktif |
+### Tablo Tanımı
 
-## 🔗 Desteklenen ERP Sistemleri
+```json
+{
+    "pl_table": "stok_kart",
+    "real_name": [],
+    "description": "Stok/ürün ana kartları",
+    "is_master": true,
+    "audit": true,
+    "soft_delete": true,
+    "columns": [...]
+}
+```
 
-| ERP | Versiyon | Durum |
-|-----|----------|-------|
-| Logo | Tiger 3, Go 3 | 🔄 Planlanan |
-| Netsis | Standard, Enterprise | 🔄 Planlanan |
-| Mikro | Jump, Classic | 🔄 Planlanan |
-| Wolvox | - | 🔄 Planlanan |
+| Alan | Tip | Açıklama |
+|------|-----|----------|
+| `pl_table` | string | PL standart tablo adı |
+| `real_name` | array | ERP'deki gerçek tablo(lar) |
+| `is_master` | boolean | Ana kayıt tablosu mu |
+| `audit` | boolean | Değişiklik takibi |
+| `soft_delete` | boolean | Yumuşak silme |
 
-## 📖 Dokümantasyon
+### Kolon Tanımı
 
-- [Modül Geliştirme Rehberi](docs/module_guide.md)
-- [Tip Sistemi](docs/types.md)
-- [ERP Mapping](docs/erp_mapping.md)
-- [Katkıda Bulunma](CONTRIBUTING.md)
-- [Değişiklik Günlüğü](CHANGELOG.md)
+```json
+{
+    "pl_column": "stok_kodu",
+    "real_name": "",
+    "type": "string",
+    "required": true,
+    "unique": true
+}
+```
 
-## 🛠️ Geliştirme
+| Alan | Tip | Açıklama |
+|------|-----|----------|
+| `pl_column` | string | PL standart kolon adı |
+| `real_name` | string | ERP'deki gerçek kolon adı |
+| `type` | string | Veri tipi |
+| `required` | boolean | Zorunlu alan |
 
-```bash
-# Validasyon çalıştır
-python validator/schema_validator.py --all modules/core
+## 📦 Stok Modülü Tabloları
 
-# JSON formatında çıktı
-python validator/schema_validator.py --all modules/core --json
+| Tablo | Açıklama |
+|-------|----------|
+| `stok_kart` | Ürün ana kartları |
+| `stok_kategori` | Kategoriler |
+| `birim` | Ölçü birimleri |
+| `depo` | Depo tanımları |
+| `marka` | Markalar |
+| `stok_hareket` | Giriş/çıkış |
+| `stok_bakiye` | Güncel bakiye |
+| `stok_fiyat` | Fiyat listeleri |
+| `stok_birim_cevrimi` | Birim dönüşümleri |
+
+## 🔗 Desteklenen ERP'ler
+
+| ERP | Örnek Tablo | Durum |
+|-----|-------------|-------|
+| Logo | LG_XXX_ITEMS | 🔄 Planlanan |
+| Netsis | TBLSTSABIT | 🔄 Planlanan |
+| Akınsoft | STOK | 🔄 Planlanan |
+
+## 💡 Örnek Eşleştirme
+
+```json
+{
+    "pl_table": "stok_kart",
+    "real_name": ["TBLSTSABIT"],
+    "columns": [
+        { "pl_column": "stok_kodu", "real_name": "STKKOD" },
+        { "pl_column": "stok_adi", "real_name": "STKCINSI" }
+    ]
+}
 ```
 
 ## 📄 Lisans

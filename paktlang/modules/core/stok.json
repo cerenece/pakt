@@ -2,584 +2,92 @@
     "$schema": "paktlang://schema/module/v1",
     "$id": "paktlang://modules/stok/v1",
     "module": "stok",
-    "version": "1.1.0",
-    "description": "Stok ve envanter yönetimi modülü",
-    "dependencies": [],
-    "priority": "high",
+    "version": "0.1.0",
+    "description": "Stok modülü iskeleti - ERP veritabanlarına erişim haritası",
     "tables": [
         {
             "pl_table": "stok_kart",
+            "real_name": [],
             "description": "Stok/ürün ana kartları",
             "is_master": true,
             "audit": true,
             "soft_delete": true,
             "columns": [
                 {
-                    "name": "id",
+                    "pl_column": "id",
+                    "real_name": "",
                     "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
+                    "primary_key": true
                 },
                 {
-                    "name": "stok_kodu",
-                    "type": "erp_code",
-                    "unique": true,
+                    "pl_column": "stok_kodu",
+                    "real_name": "",
+                    "type": "string",
                     "required": true,
-                    "indexed": true
+                    "unique": true
                 },
                 {
-                    "name": "stok_adi",
+                    "pl_column": "stok_adi",
+                    "real_name": "",
                     "type": "string",
-                    "max_length": 300,
-                    "required": true,
-                    "indexed": true
+                    "required": true
                 },
                 {
-                    "name": "kisa_ad",
+                    "pl_column": "barkod",
+                    "real_name": "",
                     "type": "string",
-                    "max_length": 100
+                    "unique": true
                 },
                 {
-                    "name": "ingilizce_adi",
-                    "type": "string",
-                    "max_length": 300
+                    "pl_column": "birim_id",
+                    "real_name": "",
+                    "type": "bigint"
                 },
                 {
-                    "name": "barkod",
-                    "type": "string",
-                    "max_length": 50,
-                    "unique": true,
-                    "indexed": true
+                    "pl_column": "kategori_id",
+                    "real_name": "",
+                    "type": "bigint"
                 },
                 {
-                    "name": "barkod_2",
-                    "type": "string",
-                    "max_length": 50
-                },
-                {
-                    "name": "barkod_3",
-                    "type": "string",
-                    "max_length": 50
-                },
-                {
-                    "name": "stok_tipi",
-                    "type": "enum",
-                    "values": [
-                        "mamul",
-                        "hammadde",
-                        "yari_mamul",
-                        "ticari_mal",
-                        "hizmet",
-                        "sabit_kiymet",
-                        "sarf_malzeme",
-                        "ambalaj",
-                        "diger"
-                    ],
-                    "required": true,
-                    "default": "ticari_mal",
-                    "indexed": true
-                },
-                {
-                    "name": "kategori_id",
-                    "type": "bigint",
-                    "indexed": true,
-                    "foreign_key": {
-                        "table": "stok_kategori",
-                        "column": "id",
-                        "on_delete": "SET NULL"
-                    }
-                },
-                {
-                    "name": "alt_kategori_id",
-                    "type": "bigint",
-                    "foreign_key": {
-                        "table": "stok_alt_kategori",
-                        "column": "id",
-                        "on_delete": "SET NULL"
-                    }
-                },
-                {
-                    "name": "marka_id",
-                    "type": "bigint",
-                    "foreign_key": {
-                        "table": "marka",
-                        "column": "id",
-                        "on_delete": "SET NULL"
-                    }
-                },
-                {
-                    "name": "model",
-                    "type": "string",
-                    "max_length": 100
-                },
-                {
-                    "name": "uretici_kodu",
-                    "type": "string",
-                    "max_length": 100,
-                    "description": "Üretici parça kodu"
-                },
-                {
-                    "name": "tedarikci_kodu",
-                    "type": "string",
-                    "max_length": 100
-                },
-                {
-                    "name": "ana_birim_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "birim",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "satis_birim_id",
-                    "type": "bigint",
-                    "foreign_key": {
-                        "table": "birim",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "alis_birim_id",
-                    "type": "bigint",
-                    "foreign_key": {
-                        "table": "birim",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "alis_fiyati",
-                    "type": "unit_price",
-                    "default": 0
-                },
-                {
-                    "name": "satis_fiyati",
-                    "type": "unit_price",
-                    "default": 0
-                },
-                {
-                    "name": "satis_fiyati_2",
-                    "type": "unit_price",
-                    "default": 0
-                },
-                {
-                    "name": "satis_fiyati_3",
-                    "type": "unit_price",
-                    "default": 0
-                },
-                {
-                    "name": "perakende_fiyat",
-                    "type": "unit_price",
-                    "default": 0
-                },
-                {
-                    "name": "para_birimi",
-                    "type": "currency_code",
-                    "default": "TRY"
-                },
-                {
-                    "name": "kdv_orani",
-                    "type": "tax_rate",
-                    "default": 20
-                },
-                {
-                    "name": "kdv_dahil",
+                    "pl_column": "aktif",
+                    "real_name": "",
                     "type": "boolean",
-                    "default": false,
-                    "description": "Fiyatlar KDV dahil mi"
-                },
-                {
-                    "name": "otv_orani",
-                    "type": "tax_rate",
-                    "default": 0
-                },
-                {
-                    "name": "oiv_orani",
-                    "type": "tax_rate",
-                    "default": 0
-                },
-                {
-                    "name": "tevkifat_orani",
-                    "type": "percentage",
-                    "default": 0
-                },
-                {
-                    "name": "min_stok",
-                    "type": "quantity",
-                    "default": 0
-                },
-                {
-                    "name": "max_stok",
-                    "type": "quantity"
-                },
-                {
-                    "name": "siparis_miktari",
-                    "type": "quantity",
-                    "description": "Ekonomik sipariş miktarı"
-                },
-                {
-                    "name": "temin_suresi_gun",
-                    "type": "integer",
-                    "default": 0
-                },
-                {
-                    "name": "raf_omru_gun",
-                    "type": "integer",
-                    "description": "Raf ömrü (son kullanma)"
-                },
-                {
-                    "name": "agirlik",
-                    "type": "decimal",
-                    "precision": 12,
-                    "scale": 4
-                },
-                {
-                    "name": "agirlik_birim",
-                    "type": "enum",
-                    "values": [
-                        "kg",
-                        "g",
-                        "mg",
-                        "ton"
-                    ],
-                    "default": "kg"
-                },
-                {
-                    "name": "hacim",
-                    "type": "decimal",
-                    "precision": 12,
-                    "scale": 4
-                },
-                {
-                    "name": "hacim_birim",
-                    "type": "enum",
-                    "values": [
-                        "m3",
-                        "lt",
-                        "ml"
-                    ],
-                    "default": "m3"
-                },
-                {
-                    "name": "en",
-                    "type": "decimal",
-                    "precision": 10,
-                    "scale": 4
-                },
-                {
-                    "name": "boy",
-                    "type": "decimal",
-                    "precision": 10,
-                    "scale": 4
-                },
-                {
-                    "name": "yukseklik",
-                    "type": "decimal",
-                    "precision": 10,
-                    "scale": 4
-                },
-                {
-                    "name": "olcu_birim",
-                    "type": "enum",
-                    "values": [
-                        "m",
-                        "cm",
-                        "mm"
-                    ],
-                    "default": "cm"
-                },
-                {
-                    "name": "lot_takibi",
-                    "type": "boolean",
-                    "default": false
-                },
-                {
-                    "name": "seri_takibi",
-                    "type": "boolean",
-                    "default": false
-                },
-                {
-                    "name": "son_kullanma_takibi",
-                    "type": "boolean",
-                    "default": false
-                },
-                {
-                    "name": "negatif_stok_izin",
-                    "type": "boolean",
-                    "default": false
-                },
-                {
-                    "name": "web_satis_aktif",
-                    "type": "boolean",
-                    "default": false
-                },
-                {
-                    "name": "gtip_kodu",
-                    "type": "string",
-                    "max_length": 20,
-                    "description": "Gümrük tarife kodu"
-                },
-                {
-                    "name": "mensei_ulke",
-                    "type": "country_code"
-                },
-                {
-                    "name": "garanti_suresi_ay",
-                    "type": "integer"
-                },
-                {
-                    "name": "ana_tedarikci_id",
-                    "type": "bigint",
-                    "description": "Ana tedarikçi cari ID"
-                },
-                {
-                    "name": "muhasebe_hesap_kodu",
-                    "type": "account_code"
-                },
-                {
-                    "name": "satis_muhasebe_hesap",
-                    "type": "account_code"
-                },
-                {
-                    "name": "maliyet_muhasebe_hesap",
-                    "type": "account_code"
-                },
-                {
-                    "name": "aciklama",
-                    "type": "text"
-                },
-                {
-                    "name": "teknik_ozellikler",
-                    "type": "text"
-                },
-                {
-                    "name": "etiketler",
-                    "type": "json"
-                },
-                {
-                    "name": "ozel_alanlar",
-                    "type": "json"
-                },
-                {
-                    "name": "resim_url",
-                    "type": "string",
-                    "max_length": 500
-                },
-                {
-                    "name": "resim_galeri",
-                    "type": "json",
-                    "description": "Ek resim URL'leri"
-                },
-                {
-                    "name": "aktif",
-                    "type": "boolean",
-                    "default": true,
-                    "indexed": true
-                },
-                {
-                    "name": "pasif_tarihi",
-                    "type": "date"
-                },
-                {
-                    "name": "olusturma_tarihi",
-                    "type": "datetime",
-                    "auto_now_add": true
-                },
-                {
-                    "name": "guncelleme_tarihi",
-                    "type": "datetime",
-                    "auto_now": true
-                }
-            ],
-            "indexes": [
-                {
-                    "name": "idx_stok_tip",
-                    "columns": [
-                        "stok_tipi"
-                    ]
-                },
-                {
-                    "name": "idx_stok_kategori",
-                    "columns": [
-                        "kategori_id"
-                    ]
-                },
-                {
-                    "name": "idx_stok_marka",
-                    "columns": [
-                        "marka_id"
-                    ]
-                },
-                {
-                    "name": "idx_stok_barkod",
-                    "columns": [
-                        "barkod"
-                    ]
-                },
-                {
-                    "name": "idx_stok_tedarikci",
-                    "columns": [
-                        "ana_tedarikci_id"
-                    ]
+                    "default": true
                 }
             ]
         },
         {
             "pl_table": "stok_kategori",
-            "description": "Stok ana kategorileri",
+            "real_name": [],
+            "description": "Stok kategorileri",
             "is_master": true,
             "columns": [
                 {
-                    "name": "id",
+                    "pl_column": "id",
+                    "real_name": "",
                     "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
+                    "primary_key": true
                 },
                 {
-                    "name": "kategori_kodu",
-                    "type": "erp_code",
-                    "unique": true,
+                    "pl_column": "kategori_kodu",
+                    "real_name": "",
+                    "type": "string",
                     "required": true
                 },
                 {
-                    "name": "kategori_adi",
+                    "pl_column": "kategori_adi",
+                    "real_name": "",
                     "type": "string",
-                    "max_length": 150,
                     "required": true
                 },
                 {
-                    "name": "ust_kategori_id",
-                    "type": "bigint",
-                    "foreign_key": {
-                        "table": "stok_kategori",
-                        "column": "id",
-                        "on_delete": "SET NULL"
-                    }
+                    "pl_column": "ust_kategori_id",
+                    "real_name": "",
+                    "type": "bigint"
                 },
                 {
-                    "name": "seviye",
-                    "type": "integer",
-                    "min": 1,
-                    "max": 5,
-                    "default": 1
-                },
-                {
-                    "name": "sira_no",
-                    "type": "integer"
-                },
-                {
-                    "name": "varsayilan_kdv",
-                    "type": "tax_rate"
-                },
-                {
-                    "name": "muhasebe_hesap_kodu",
-                    "type": "account_code"
-                },
-                {
-                    "name": "aciklama",
-                    "type": "text"
-                },
-                {
-                    "name": "resim_url",
-                    "type": "string",
-                    "max_length": 500
-                },
-                {
-                    "name": "aktif",
-                    "type": "boolean",
-                    "default": true
-                }
-            ]
-        },
-        {
-            "pl_table": "stok_alt_kategori",
-            "description": "Stok alt kategorileri",
-            "is_master": true,
-            "columns": [
-                {
-                    "name": "id",
-                    "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
-                },
-                {
-                    "name": "alt_kategori_kodu",
-                    "type": "erp_code",
-                    "unique": true,
-                    "required": true
-                },
-                {
-                    "name": "alt_kategori_adi",
-                    "type": "string",
-                    "max_length": 150,
-                    "required": true
-                },
-                {
-                    "name": "ana_kategori_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "stok_kategori",
-                        "column": "id",
-                        "on_delete": "CASCADE"
-                    }
-                },
-                {
-                    "name": "sira_no",
-                    "type": "integer"
-                },
-                {
-                    "name": "aktif",
-                    "type": "boolean",
-                    "default": true
-                }
-            ]
-        },
-        {
-            "pl_table": "marka",
-            "description": "Ürün markaları",
-            "is_master": true,
-            "columns": [
-                {
-                    "name": "id",
-                    "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
-                },
-                {
-                    "name": "marka_kodu",
-                    "type": "erp_code",
-                    "unique": true,
-                    "required": true
-                },
-                {
-                    "name": "marka_adi",
-                    "type": "string",
-                    "max_length": 100,
-                    "required": true
-                },
-                {
-                    "name": "uretici_firma",
-                    "type": "string",
-                    "max_length": 200
-                },
-                {
-                    "name": "mensei_ulke",
-                    "type": "country_code"
-                },
-                {
-                    "name": "logo_url",
-                    "type": "string",
-                    "max_length": 500
-                },
-                {
-                    "name": "web_sitesi",
-                    "type": "string",
-                    "max_length": 200
-                },
-                {
-                    "name": "aktif",
+                    "pl_column": "aktif",
+                    "real_name": "",
                     "type": "boolean",
                     "default": true
                 }
@@ -587,1762 +95,261 @@
         },
         {
             "pl_table": "birim",
+            "real_name": [],
             "description": "Ölçü birimleri",
             "is_master": true,
             "columns": [
                 {
-                    "name": "id",
+                    "pl_column": "id",
+                    "real_name": "",
                     "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
+                    "primary_key": true
                 },
                 {
-                    "name": "birim_kodu",
-                    "type": "unit_code",
-                    "unique": true,
-                    "required": true
-                },
-                {
-                    "name": "birim_adi",
+                    "pl_column": "birim_kodu",
+                    "real_name": "",
                     "type": "string",
-                    "max_length": 50,
                     "required": true
                 },
                 {
-                    "name": "birim_tipi",
-                    "type": "enum",
-                    "values": [
-                        "adet",
-                        "agirlik",
-                        "uzunluk",
-                        "hacim",
-                        "alan",
-                        "zaman",
-                        "diger"
-                    ],
-                    "required": true
-                },
-                {
-                    "name": "kisaltma",
+                    "pl_column": "birim_adi",
+                    "real_name": "",
                     "type": "string",
-                    "max_length": 10
+                    "required": true
                 },
                 {
-                    "name": "ondalik_basamak",
-                    "type": "integer",
-                    "min": 0,
-                    "max": 6,
-                    "default": 2
-                },
-                {
-                    "name": "sistem_birimi",
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Sistem tarafından tanımlı"
-                },
-                {
-                    "name": "aktif",
+                    "pl_column": "aktif",
+                    "real_name": "",
                     "type": "boolean",
                     "default": true
-                }
-            ]
-        },
-        {
-            "pl_table": "stok_birim_cevrimi",
-            "description": "Stok birim dönüşüm oranları",
-            "is_master": false,
-            "columns": [
-                {
-                    "name": "id",
-                    "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
-                },
-                {
-                    "name": "stok_id",
-                    "type": "bigint",
-                    "required": true,
-                    "indexed": true,
-                    "foreign_key": {
-                        "table": "stok_kart",
-                        "column": "id",
-                        "on_delete": "CASCADE"
-                    }
-                },
-                {
-                    "name": "kaynak_birim_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "birim",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "hedef_birim_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "birim",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "cevrim_orani",
-                    "type": "decimal",
-                    "precision": 18,
-                    "scale": 6,
-                    "required": true
-                },
-                {
-                    "name": "barkod",
-                    "type": "string",
-                    "max_length": 50,
-                    "description": "Bu birime özel barkod"
-                },
-                {
-                    "name": "agirlik",
-                    "type": "decimal",
-                    "precision": 12,
-                    "scale": 4
-                },
-                {
-                    "name": "varsayilan_alis",
-                    "type": "boolean",
-                    "default": false
-                },
-                {
-                    "name": "varsayilan_satis",
-                    "type": "boolean",
-                    "default": false
                 }
             ]
         },
         {
             "pl_table": "depo",
+            "real_name": [],
             "description": "Depo/ambar tanımları",
             "is_master": true,
             "columns": [
                 {
-                    "name": "id",
+                    "pl_column": "id",
+                    "real_name": "",
                     "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
+                    "primary_key": true
                 },
                 {
-                    "name": "depo_kodu",
-                    "type": "warehouse_code",
-                    "unique": true,
+                    "pl_column": "depo_kodu",
+                    "real_name": "",
+                    "type": "string",
                     "required": true
                 },
                 {
-                    "name": "depo_adi",
+                    "pl_column": "depo_adi",
+                    "real_name": "",
                     "type": "string",
-                    "max_length": 100,
                     "required": true
                 },
                 {
-                    "name": "depo_tipi",
-                    "type": "enum",
-                    "values": [
-                        "ana_depo",
-                        "sube_depo",
-                        "iade_depo",
-                        "hurda_depo",
-                        "transit_depo",
-                        "konsiye_depo",
-                        "uretim_depo",
-                        "satici_depo"
-                    ],
-                    "default": "ana_depo"
-                },
-                {
-                    "name": "adres",
-                    "type": "text"
-                },
-                {
-                    "name": "il",
-                    "type": "string",
-                    "max_length": 50
-                },
-                {
-                    "name": "ilce",
-                    "type": "string",
-                    "max_length": 50
-                },
-                {
-                    "name": "telefon",
-                    "type": "phone"
-                },
-                {
-                    "name": "yetkili_kisi",
-                    "type": "string",
-                    "max_length": 150
-                },
-                {
-                    "name": "yetkili_telefon",
-                    "type": "phone"
-                },
-                {
-                    "name": "lokasyon_takibi",
-                    "type": "boolean",
-                    "default": false
-                },
-                {
-                    "name": "negatif_stok_izin",
-                    "type": "boolean",
-                    "default": false
-                },
-                {
-                    "name": "muhasebe_hesap_kodu",
-                    "type": "account_code"
-                },
-                {
-                    "name": "sube_kodu",
-                    "type": "string",
-                    "max_length": 20
-                },
-                {
-                    "name": "enlem",
-                    "type": "decimal",
-                    "precision": 10,
-                    "scale": 8
-                },
-                {
-                    "name": "boylam",
-                    "type": "decimal",
-                    "precision": 11,
-                    "scale": 8
-                },
-                {
-                    "name": "sira_no",
-                    "type": "integer"
-                },
-                {
-                    "name": "aktif",
+                    "pl_column": "aktif",
+                    "real_name": "",
                     "type": "boolean",
                     "default": true
-                }
-            ]
-        },
-        {
-            "pl_table": "depo_lokasyon",
-            "description": "Depo içi lokasyon tanımları (raf/koridor)",
-            "is_master": true,
-            "columns": [
-                {
-                    "name": "id",
-                    "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
-                },
-                {
-                    "name": "depo_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "depo",
-                        "column": "id",
-                        "on_delete": "CASCADE"
-                    }
-                },
-                {
-                    "name": "lokasyon_kodu",
-                    "type": "erp_code",
-                    "required": true
-                },
-                {
-                    "name": "lokasyon_adi",
-                    "type": "string",
-                    "max_length": 100
-                },
-                {
-                    "name": "koridor",
-                    "type": "string",
-                    "max_length": 20
-                },
-                {
-                    "name": "raf",
-                    "type": "string",
-                    "max_length": 20
-                },
-                {
-                    "name": "kat",
-                    "type": "string",
-                    "max_length": 20
-                },
-                {
-                    "name": "bolme",
-                    "type": "string",
-                    "max_length": 20
-                },
-                {
-                    "name": "lokasyon_tipi",
-                    "type": "enum",
-                    "values": [
-                        "raf",
-                        "palet",
-                        "zemin",
-                        "soguk",
-                        "tehlikeli",
-                        "karantina"
-                    ]
-                },
-                {
-                    "name": "max_kapasite",
-                    "type": "quantity"
-                },
-                {
-                    "name": "aktif",
-                    "type": "boolean",
-                    "default": true
-                }
-            ],
-            "indexes": [
-                {
-                    "name": "idx_lokasyon_depo",
-                    "columns": [
-                        "depo_id"
-                    ]
-                },
-                {
-                    "name": "idx_lokasyon_kod",
-                    "columns": [
-                        "depo_id",
-                        "lokasyon_kodu"
-                    ],
-                    "unique": true
                 }
             ]
         },
         {
             "pl_table": "stok_hareket",
+            "real_name": [],
             "description": "Stok giriş/çıkış hareketleri",
             "is_master": false,
             "audit": true,
             "columns": [
                 {
-                    "name": "id",
+                    "pl_column": "id",
+                    "real_name": "",
                     "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
+                    "primary_key": true
                 },
                 {
-                    "name": "hareket_no",
-                    "type": "document_number",
-                    "indexed": true
-                },
-                {
-                    "name": "stok_id",
+                    "pl_column": "stok_id",
+                    "real_name": "",
                     "type": "bigint",
-                    "required": true,
-                    "indexed": true,
-                    "foreign_key": {
-                        "table": "stok_kart",
-                        "column": "id",
-                        "on_delete": "RESTRICT"
-                    }
-                },
-                {
-                    "name": "depo_id",
-                    "type": "bigint",
-                    "required": true,
-                    "indexed": true,
-                    "foreign_key": {
-                        "table": "depo",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "lokasyon_id",
-                    "type": "bigint",
-                    "foreign_key": {
-                        "table": "depo_lokasyon",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "hareket_tarihi",
-                    "type": "date",
-                    "required": true,
-                    "indexed": true
-                },
-                {
-                    "name": "islem_zamani",
-                    "type": "datetime",
-                    "auto_now_add": true
-                },
-                {
-                    "name": "hareket_tipi",
-                    "type": "enum",
-                    "values": [
-                        "giris",
-                        "cikis"
-                    ],
-                    "required": true,
-                    "indexed": true
-                },
-                {
-                    "name": "hareket_turu",
-                    "type": "enum",
-                    "values": [
-                        "devir",
-                        "alis",
-                        "satis",
-                        "iade_alis",
-                        "iade_satis",
-                        "uretim_giris",
-                        "uretim_cikis",
-                        "transfer_giris",
-                        "transfer_cikis",
-                        "sayim_fazla",
-                        "sayim_eksik",
-                        "fire",
-                        "hurda",
-                        "numune",
-                        "hediye",
-                        "acilis",
-                        "virman",
-                        "konsinye_giris",
-                        "konsinye_cikis",
-                        "mustahsil",
-                        "miktarsiz_maliyet",
-                        "muhtelif_musteri",
-                        "zayi_iade",
-                        "sarf",
-                        "diger"
-                    ],
-                    "required": true,
-                    "description": "PaktLang hareket türü - ERP sistemlerine hareket_turu_kod ile eşleştirilir"
-                },
-                {
-                    "name": "miktar",
-                    "type": "quantity",
                     "required": true
                 },
                 {
-                    "name": "birim_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "birim",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "ana_birim_miktar",
-                    "type": "quantity",
-                    "description": "Ana birime çevrilmiş miktar"
-                },
-                {
-                    "name": "birim_fiyat",
-                    "type": "unit_price",
-                    "default": 0
-                },
-                {
-                    "name": "toplam_tutar",
-                    "type": "currency",
-                    "default": 0
-                },
-                {
-                    "name": "para_birimi",
-                    "type": "currency_code",
-                    "default": "TRY"
-                },
-                {
-                    "name": "doviz_kuru",
-                    "type": "exchange_rate",
-                    "default": 1
-                },
-                {
-                    "name": "lot_no",
-                    "type": "string",
-                    "max_length": 50,
-                    "indexed": true
-                },
-                {
-                    "name": "seri_no",
-                    "type": "string",
-                    "max_length": 100
-                },
-                {
-                    "name": "son_kullanma_tarihi",
-                    "type": "date"
-                },
-                {
-                    "name": "uretim_tarihi",
-                    "type": "date"
-                },
-                {
-                    "name": "cari_id",
-                    "type": "bigint",
-                    "indexed": true,
-                    "description": "İlgili cari hesap"
-                },
-                {
-                    "name": "belge_no",
-                    "type": "document_number",
-                    "indexed": true
-                },
-                {
-                    "name": "belge_tarihi",
-                    "type": "date"
-                },
-                {
-                    "name": "irsaliye_no",
-                    "type": "string",
-                    "max_length": 50
-                },
-                {
-                    "name": "fatura_no",
-                    "type": "string",
-                    "max_length": 50
-                },
-                {
-                    "name": "aciklama",
-                    "type": "text"
-                },
-                {
-                    "name": "kaynak_modul",
-                    "type": "enum",
-                    "values": [
-                        "satis",
-                        "satin_alma",
-                        "uretim",
-                        "sayim",
-                        "transfer",
-                        "manuel"
-                    ]
-                },
-                {
-                    "name": "kaynak_tablo",
-                    "type": "string",
-                    "max_length": 100
-                },
-                {
-                    "name": "kaynak_id",
+                    "pl_column": "depo_id",
+                    "real_name": "",
                     "type": "bigint"
                 },
                 {
-                    "name": "belge_tipi_kod",
-                    "type": "enum",
-                    "values": [
-                        "1",
-                        "2",
-                        "3",
-                        "4",
-                        "6",
-                        "7",
-                        "8",
-                        "9",
-                        "A"
-                    ],
-                    "description": "Netsis STHAR_FTIRSIP uyumlu: 1=Satış Fat, 2=Alış Fat, 3=Satış İrs, 4=Alış İrs, 6=Müş.Sip, 7=Satıcı Sip, 8=DAT Giriş, 9=DAT Çıkış, A=Saklanmış İrs"
-                },
-                {
-                    "name": "hareket_turu_kod",
-                    "type": "enum",
-                    "values": [
-                        "A",
-                        "B",
-                        "C",
-                        "D",
-                        "E",
-                        "F",
-                        "G",
-                        "H",
-                        "I",
-                        "J",
-                        "K",
-                        "L",
-                        "M"
-                    ],
-                    "description": "Netsis STHAR_HTUR uyumlu: A=Devir, B=Transfer, C=Üretim, D=Muhtelif, E=Miktarsız Maliyet, F=Konsinye, G=Müstahsil, H=İrsaliye, I=Kapalı Fat, J=Açık Fat, K=Muhtelif Müşteri, L=İade, M=Zayi İade"
-                },
-                {
-                    "name": "kaynak_belge_tipi",
-                    "type": "enum",
-                    "values": [
-                        "fatura",
-                        "irsaliye"
-                    ],
-                    "description": "Netsis STHAR_BGTIP uyumlu: F=Fatura, I=İrsaliye"
-                },
-                {
-                    "name": "siparis_id",
-                    "type": "bigint",
-                    "indexed": true,
-                    "description": "Bağlı sipariş kaydı"
-                },
-                {
-                    "name": "siparis_no",
-                    "type": "document_number",
-                    "indexed": true,
-                    "description": "Netsis STHAR_SIPNUM uyumlu sipariş numarası"
-                },
-                {
-                    "name": "konsinye",
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Konsinye hareket mi"
-                },
-                {
-                    "name": "mustahsil",
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Müstahsil makbuzu mu"
-                },
-                {
-                    "name": "olusturma_tarihi",
-                    "type": "datetime",
-                    "auto_now_add": true
-                }
-            ],
-            "indexes": [
-                {
-                    "name": "idx_hareket_stok_tarih",
-                    "columns": [
-                        "stok_id",
-                        "hareket_tarihi"
-                    ]
-                },
-                {
-                    "name": "idx_hareket_depo",
-                    "columns": [
-                        "depo_id",
-                        "hareket_tarihi"
-                    ]
-                },
-                {
-                    "name": "idx_hareket_lot",
-                    "columns": [
-                        "lot_no"
-                    ]
-                },
-                {
-                    "name": "idx_hareket_belge",
-                    "columns": [
-                        "belge_no"
-                    ]
-                },
-                {
-                    "name": "idx_hareket_kaynak",
-                    "columns": [
-                        "kaynak_modul",
-                        "kaynak_id"
-                    ]
-                }
-            ]
-        },
-        {
-            "pl_table": "stok_fiyat",
-            "description": "Fiyat listesi detayları",
-            "is_master": false,
-            "columns": [
-                {
-                    "name": "id",
-                    "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
-                },
-                {
-                    "name": "fiyat_listesi_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "fiyat_listesi",
-                        "column": "id",
-                        "on_delete": "CASCADE"
-                    }
-                },
-                {
-                    "name": "stok_id",
-                    "type": "bigint",
-                    "required": true,
-                    "indexed": true,
-                    "foreign_key": {
-                        "table": "stok_kart",
-                        "column": "id",
-                        "on_delete": "CASCADE"
-                    }
-                },
-                {
-                    "name": "birim_id",
-                    "type": "bigint",
-                    "foreign_key": {
-                        "table": "birim",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "fiyat",
-                    "type": "unit_price",
-                    "required": true
-                },
-                {
-                    "name": "min_miktar",
-                    "type": "quantity",
-                    "default": 1
-                },
-                {
-                    "name": "max_miktar",
-                    "type": "quantity"
-                },
-                {
-                    "name": "iskonto_orani",
-                    "type": "discount_rate",
-                    "default": 0
-                },
-                {
-                    "name": "gecerlilik_baslangic",
-                    "type": "date"
-                },
-                {
-                    "name": "gecerlilik_bitis",
-                    "type": "date"
-                },
-                {
-                    "name": "aktif",
-                    "type": "boolean",
-                    "default": true
-                }
-            ],
-            "indexes": [
-                {
-                    "name": "idx_fiyat_liste_stok",
-                    "columns": [
-                        "fiyat_listesi_id",
-                        "stok_id"
-                    ]
-                }
-            ]
-        },
-        {
-            "pl_table": "fiyat_listesi",
-            "description": "Fiyat listesi başlıkları",
-            "is_master": true,
-            "columns": [
-                {
-                    "name": "id",
-                    "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
-                },
-                {
-                    "name": "liste_kodu",
-                    "type": "erp_code",
-                    "unique": true,
-                    "required": true
-                },
-                {
-                    "name": "liste_adi",
+                    "pl_column": "hareket_tipi",
+                    "real_name": "",
                     "type": "string",
-                    "max_length": 100,
                     "required": true
                 },
                 {
-                    "name": "liste_tipi",
-                    "type": "enum",
-                    "values": [
-                        "satis",
-                        "alis",
-                        "bayi",
-                        "toptan",
-                        "perakende",
-                        "kampanya"
-                    ],
-                    "default": "satis"
+                    "pl_column": "miktar",
+                    "real_name": "",
+                    "type": "decimal",
+                    "required": true
                 },
                 {
-                    "name": "para_birimi",
-                    "type": "currency_code",
-                    "default": "TRY"
-                },
-                {
-                    "name": "kdv_dahil",
-                    "type": "boolean",
-                    "default": false
-                },
-                {
-                    "name": "gecerlilik_baslangic",
-                    "type": "date"
-                },
-                {
-                    "name": "gecerlilik_bitis",
-                    "type": "date"
-                },
-                {
-                    "name": "varsayilan",
-                    "type": "boolean",
-                    "default": false
-                },
-                {
-                    "name": "oncelik",
-                    "type": "integer",
-                    "default": 0
-                },
-                {
-                    "name": "aciklama",
-                    "type": "text"
-                },
-                {
-                    "name": "aktif",
-                    "type": "boolean",
-                    "default": true
+                    "pl_column": "tarih",
+                    "real_name": "",
+                    "type": "datetime",
+                    "required": true
                 }
             ]
         },
         {
             "pl_table": "stok_bakiye",
+            "real_name": [],
             "description": "Stok güncel bakiyesi (depo bazlı)",
             "is_master": false,
             "columns": [
                 {
-                    "name": "id",
+                    "pl_column": "id",
+                    "real_name": "",
                     "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
+                    "primary_key": true
                 },
                 {
-                    "name": "stok_id",
+                    "pl_column": "stok_id",
+                    "real_name": "",
                     "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "stok_kart",
-                        "column": "id",
-                        "on_delete": "CASCADE"
-                    }
-                },
-                {
-                    "name": "depo_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "depo",
-                        "column": "id",
-                        "on_delete": "CASCADE"
-                    }
-                },
-                {
-                    "name": "lokasyon_id",
-                    "type": "bigint",
-                    "foreign_key": {
-                        "table": "depo_lokasyon",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "miktar",
-                    "type": "quantity",
-                    "default": 0
-                },
-                {
-                    "name": "rezerve_miktar",
-                    "type": "quantity",
-                    "default": 0,
-                    "description": "Sipariş için ayrılmış"
-                },
-                {
-                    "name": "kullanilabilir_miktar",
-                    "type": "quantity",
-                    "default": 0,
-                    "computed": "miktar - rezerve_miktar"
-                },
-                {
-                    "name": "lot_no",
-                    "type": "string",
-                    "max_length": 50
-                },
-                {
-                    "name": "son_kullanma_tarihi",
-                    "type": "date"
-                },
-                {
-                    "name": "son_hareket_tarihi",
-                    "type": "datetime"
-                },
-                {
-                    "name": "guncelleme_tarihi",
-                    "type": "datetime",
-                    "auto_now": true
-                }
-            ],
-            "indexes": [
-                {
-                    "name": "idx_bakiye_stok_depo",
-                    "columns": [
-                        "stok_id",
-                        "depo_id"
-                    ],
-                    "unique": true
-                }
-            ]
-        },
-        {
-            "pl_table": "stok_sayim",
-            "description": "Stok sayım başlıkları",
-            "is_master": true,
-            "audit": true,
-            "columns": [
-                {
-                    "name": "id",
-                    "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
-                },
-                {
-                    "name": "sayim_no",
-                    "type": "document_number",
-                    "unique": true,
                     "required": true
                 },
                 {
-                    "name": "sayim_tarihi",
-                    "type": "date",
+                    "pl_column": "depo_id",
+                    "real_name": "",
+                    "type": "bigint",
                     "required": true
                 },
                 {
-                    "name": "depo_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "depo",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "sayim_tipi",
-                    "type": "enum",
-                    "values": [
-                        "genel",
-                        "kategori",
-                        "lokasyon",
-                        "abc",
-                        "rastgele"
-                    ],
-                    "default": "genel"
-                },
-                {
-                    "name": "durum",
-                    "type": "enum",
-                    "values": [
-                        "planli",
-                        "devam_ediyor",
-                        "tamamlandi",
-                        "onaylandi",
-                        "iptal"
-                    ],
-                    "default": "planli"
-                },
-                {
-                    "name": "sayim_sorumlusu",
-                    "type": "string",
-                    "max_length": 150
-                },
-                {
-                    "name": "aciklama",
-                    "type": "text"
-                },
-                {
-                    "name": "tamamlanma_tarihi",
-                    "type": "datetime"
-                },
-                {
-                    "name": "onay_tarihi",
-                    "type": "datetime"
-                },
-                {
-                    "name": "onaylayan",
-                    "type": "string",
-                    "max_length": 100
+                    "pl_column": "miktar",
+                    "real_name": "",
+                    "type": "decimal",
+                    "required": true
                 }
             ]
         },
         {
-            "pl_table": "stok_sayim_detay",
-            "description": "Stok sayım kalemleri",
+            "pl_table": "stok_fiyat",
+            "real_name": [],
+            "description": "Stok fiyat bilgileri",
             "is_master": false,
             "columns": [
                 {
-                    "name": "id",
+                    "pl_column": "id",
+                    "real_name": "",
                     "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
+                    "primary_key": true
                 },
                 {
-                    "name": "sayim_id",
+                    "pl_column": "stok_id",
+                    "real_name": "",
                     "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "stok_sayim",
-                        "column": "id",
-                        "on_delete": "CASCADE"
-                    }
-                },
-                {
-                    "name": "stok_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "stok_kart",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "lokasyon_id",
-                    "type": "bigint",
-                    "foreign_key": {
-                        "table": "depo_lokasyon",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "lot_no",
-                    "type": "string",
-                    "max_length": 50
-                },
-                {
-                    "name": "sistem_miktar",
-                    "type": "quantity",
                     "required": true
                 },
                 {
-                    "name": "sayilan_miktar",
-                    "type": "quantity"
-                },
-                {
-                    "name": "fark_miktar",
-                    "type": "quantity",
-                    "computed": "sayilan_miktar - sistem_miktar"
-                },
-                {
-                    "name": "birim_maliyet",
-                    "type": "unit_price"
-                },
-                {
-                    "name": "fark_tutar",
-                    "type": "currency"
-                },
-                {
-                    "name": "durum",
-                    "type": "enum",
-                    "values": [
-                        "sayilmadi",
-                        "sayildi",
-                        "onaylandi",
-                        "duzeltildi"
-                    ],
-                    "default": "sayilmadi"
-                },
-                {
-                    "name": "aciklama",
-                    "type": "text"
-                },
-                {
-                    "name": "sayan_kisi",
+                    "pl_column": "fiyat_tipi",
+                    "real_name": "",
                     "type": "string",
-                    "max_length": 100
-                },
-                {
-                    "name": "sayim_zamani",
-                    "type": "datetime"
-                }
-            ]
-        },
-        {
-            "pl_table": "stok_transfer",
-            "description": "Depolar arası transfer",
-            "is_master": true,
-            "audit": true,
-            "columns": [
-                {
-                    "name": "id",
-                    "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
-                },
-                {
-                    "name": "transfer_no",
-                    "type": "document_number",
-                    "unique": true,
                     "required": true
                 },
                 {
-                    "name": "transfer_tarihi",
-                    "type": "date",
+                    "pl_column": "fiyat",
+                    "real_name": "",
+                    "type": "decimal",
                     "required": true
                 },
                 {
-                    "name": "kaynak_depo_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "depo",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "hedef_depo_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "depo",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "durum",
-                    "type": "enum",
-                    "values": [
-                        "taslak",
-                        "onaylandi",
-                        "yolda",
-                        "teslim_alindi",
-                        "iptal"
-                    ],
-                    "default": "taslak"
-                },
-                {
-                    "name": "aciklama",
-                    "type": "text"
-                },
-                {
-                    "name": "tasiyici_firma",
+                    "pl_column": "para_birimi",
+                    "real_name": "",
                     "type": "string",
-                    "max_length": 200
-                },
-                {
-                    "name": "tasima_ucreti",
-                    "type": "currency"
-                },
-                {
-                    "name": "tahmini_varis",
-                    "type": "date"
-                },
-                {
-                    "name": "gercek_varis",
-                    "type": "date"
-                }
-            ]
-        },
-        {
-            "pl_table": "stok_transfer_detay",
-            "description": "Transfer kalemleri",
-            "is_master": false,
-            "columns": [
-                {
-                    "name": "id",
-                    "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
-                },
-                {
-                    "name": "transfer_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "stok_transfer",
-                        "column": "id",
-                        "on_delete": "CASCADE"
-                    }
-                },
-                {
-                    "name": "stok_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "stok_kart",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "miktar",
-                    "type": "quantity",
-                    "required": true
-                },
-                {
-                    "name": "birim_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "birim",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "kaynak_lokasyon_id",
-                    "type": "bigint",
-                    "foreign_key": {
-                        "table": "depo_lokasyon",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "hedef_lokasyon_id",
-                    "type": "bigint",
-                    "foreign_key": {
-                        "table": "depo_lokasyon",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "lot_no",
-                    "type": "string",
-                    "max_length": 50
-                },
-                {
-                    "name": "teslim_alinan",
-                    "type": "quantity",
-                    "default": 0
-                }
-            ]
-        },
-        {
-            "pl_table": "stok_lot",
-            "description": "Lot/parti takip kayıtları",
-            "is_master": false,
-            "columns": [
-                {
-                    "name": "id",
-                    "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
-                },
-                {
-                    "name": "stok_id",
-                    "type": "bigint",
-                    "required": true,
-                    "indexed": true,
-                    "foreign_key": {
-                        "table": "stok_kart",
-                        "column": "id",
-                        "on_delete": "CASCADE"
-                    }
-                },
-                {
-                    "name": "lot_no",
-                    "type": "string",
-                    "max_length": 50,
-                    "required": true,
-                    "indexed": true
-                },
-                {
-                    "name": "uretim_tarihi",
-                    "type": "date"
-                },
-                {
-                    "name": "son_kullanma_tarihi",
-                    "type": "date",
-                    "indexed": true
-                },
-                {
-                    "name": "tedarikci_lot_no",
-                    "type": "string",
-                    "max_length": 50
-                },
-                {
-                    "name": "tedarikci_id",
-                    "type": "bigint"
-                },
-                {
-                    "name": "kalite_durumu",
-                    "type": "enum",
-                    "values": [
-                        "beklemede",
-                        "onaylandi",
-                        "reddedildi",
-                        "karantina"
-                    ],
-                    "default": "beklemede"
-                },
-                {
-                    "name": "kalite_onay_tarihi",
-                    "type": "date"
-                },
-                {
-                    "name": "notlar",
-                    "type": "text"
-                }
-            ],
-            "indexes": [
-                {
-                    "name": "idx_lot_stok",
-                    "columns": [
-                        "stok_id",
-                        "lot_no"
-                    ],
-                    "unique": true
-                }
-            ]
-        },
-        {
-            "pl_table": "stok_seri",
-            "description": "Seri numarası takip kayıtları",
-            "is_master": false,
-            "columns": [
-                {
-                    "name": "id",
-                    "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
-                },
-                {
-                    "name": "stok_id",
-                    "type": "bigint",
-                    "required": true,
-                    "indexed": true,
-                    "foreign_key": {
-                        "table": "stok_kart",
-                        "column": "id",
-                        "on_delete": "CASCADE"
-                    }
-                },
-                {
-                    "name": "seri_no",
-                    "type": "string",
-                    "max_length": 100,
-                    "required": true,
-                    "indexed": true
-                },
-                {
-                    "name": "lot_id",
-                    "type": "bigint",
-                    "foreign_key": {
-                        "table": "stok_lot",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "depo_id",
-                    "type": "bigint",
-                    "foreign_key": {
-                        "table": "depo",
-                        "column": "id"
-                    }
-                },
-                {
-                    "name": "durum",
-                    "type": "enum",
-                    "values": [
-                        "stokta",
-                        "satildi",
-                        "iade",
-                        "garanti",
-                        "hurda"
-                    ],
-                    "default": "stokta"
-                },
-                {
-                    "name": "satin_alma_tarihi",
-                    "type": "date"
-                },
-                {
-                    "name": "satis_tarihi",
-                    "type": "date"
-                },
-                {
-                    "name": "garanti_bitis",
-                    "type": "date"
-                },
-                {
-                    "name": "musteri_id",
-                    "type": "bigint",
-                    "description": "Satıldığı müşteri"
-                },
-                {
-                    "name": "notlar",
-                    "type": "text"
-                }
-            ],
-            "indexes": [
-                {
-                    "name": "idx_seri_stok",
-                    "columns": [
-                        "stok_id",
-                        "seri_no"
-                    ],
-                    "unique": true
-                }
-            ]
-        },
-        {
-            "pl_table": "stok_varyant",
-            "description": "Ürün varyantları (renk, beden vb.)",
-            "is_master": false,
-            "columns": [
-                {
-                    "name": "id",
-                    "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
-                },
-                {
-                    "name": "ana_stok_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "stok_kart",
-                        "column": "id",
-                        "on_delete": "CASCADE"
-                    }
-                },
-                {
-                    "name": "varyant_stok_id",
-                    "type": "bigint",
-                    "required": true,
-                    "foreign_key": {
-                        "table": "stok_kart",
-                        "column": "id",
-                        "on_delete": "CASCADE"
-                    }
-                },
-                {
-                    "name": "varyant_tipi",
-                    "type": "string",
-                    "max_length": 50,
-                    "description": "Örn: Renk, Beden"
-                },
-                {
-                    "name": "varyant_degeri",
-                    "type": "string",
-                    "max_length": 100
-                },
-                {
-                    "name": "sira_no",
-                    "type": "integer"
-                }
-            ]
-        },
-        {
-            "pl_table": "stok_tedarikci",
-            "description": "Stok-tedarikçi ilişkileri",
-            "is_master": false,
-            "columns": [
-                {
-                    "name": "id",
-                    "type": "bigint",
-                    "primary_key": true,
-                    "auto_increment": true
-                },
-                {
-                    "name": "stok_id",
-                    "type": "bigint",
-                    "required": true,
-                    "indexed": true,
-                    "foreign_key": {
-                        "table": "stok_kart",
-                        "column": "id",
-                        "on_delete": "CASCADE"
-                    }
-                },
-                {
-                    "name": "tedarikci_id",
-                    "type": "bigint",
-                    "required": true,
-                    "indexed": true,
-                    "description": "Cari kart referansı"
-                },
-                {
-                    "name": "tedarikci_stok_kodu",
-                    "type": "string",
-                    "max_length": 100
-                },
-                {
-                    "name": "tedarikci_stok_adi",
-                    "type": "string",
-                    "max_length": 300
-                },
-                {
-                    "name": "alis_fiyati",
-                    "type": "unit_price"
-                },
-                {
-                    "name": "para_birimi",
-                    "type": "currency_code",
                     "default": "TRY"
                 },
                 {
-                    "name": "min_siparis_miktar",
-                    "type": "quantity"
+                    "pl_column": "gecerlilik_baslangic",
+                    "real_name": "",
+                    "type": "date"
                 },
                 {
-                    "name": "temin_suresi_gun",
-                    "type": "integer"
+                    "pl_column": "gecerlilik_bitis",
+                    "real_name": "",
+                    "type": "date"
+                }
+            ]
+        },
+        {
+            "pl_table": "stok_birim_cevrimi",
+            "real_name": [],
+            "description": "Birim dönüşüm oranları (1 koli = 12 adet)",
+            "is_master": false,
+            "columns": [
+                {
+                    "pl_column": "id",
+                    "real_name": "",
+                    "type": "bigint",
+                    "primary_key": true
                 },
                 {
-                    "name": "ana_tedarikci",
-                    "type": "boolean",
-                    "default": false
+                    "pl_column": "stok_id",
+                    "real_name": "",
+                    "type": "bigint",
+                    "required": true
                 },
                 {
-                    "name": "aktif",
+                    "pl_column": "kaynak_birim_id",
+                    "real_name": "",
+                    "type": "bigint",
+                    "required": true
+                },
+                {
+                    "pl_column": "hedef_birim_id",
+                    "real_name": "",
+                    "type": "bigint",
+                    "required": true
+                },
+                {
+                    "pl_column": "cevrim_orani",
+                    "real_name": "",
+                    "type": "decimal",
+                    "required": true
+                }
+            ]
+        },
+        {
+            "pl_table": "marka",
+            "real_name": [],
+            "description": "Ürün markaları",
+            "is_master": true,
+            "columns": [
+                {
+                    "pl_column": "id",
+                    "real_name": "",
+                    "type": "bigint",
+                    "primary_key": true
+                },
+                {
+                    "pl_column": "marka_kodu",
+                    "real_name": "",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "pl_column": "marka_adi",
+                    "real_name": "",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "pl_column": "aktif",
+                    "real_name": "",
                     "type": "boolean",
                     "default": true
                 }
-            ],
-            "indexes": [
-                {
-                    "name": "idx_tedarikci_stok",
-                    "columns": [
-                        "stok_id",
-                        "tedarikci_id"
-                    ]
-                }
             ]
-        }
-    ],
-    "views": [
-        {
-            "name": "stok_toplam_bakiye",
-            "description": "Stok toplam bakiye özeti",
-            "base_tables": [
-                "stok_kart",
-                "stok_bakiye",
-                "depo"
-            ],
-            "columns": [
-                {
-                    "name": "stok_id",
-                    "source": "stok_kart.id"
-                },
-                {
-                    "name": "stok_kodu",
-                    "source": "stok_kart.stok_kodu"
-                },
-                {
-                    "name": "stok_adi",
-                    "source": "stok_kart.stok_adi"
-                },
-                {
-                    "name": "toplam_miktar",
-                    "aggregation": "SUM(miktar)"
-                },
-                {
-                    "name": "rezerve_miktar",
-                    "aggregation": "SUM(rezerve_miktar)"
-                },
-                {
-                    "name": "kullanilabilir",
-                    "aggregation": "SUM(kullanilabilir_miktar)"
-                },
-                {
-                    "name": "depo_sayisi",
-                    "aggregation": "COUNT(DISTINCT depo_id)"
-                }
-            ]
-        },
-        {
-            "name": "stok_depo_bakiye",
-            "description": "Depo bazlı stok durumu",
-            "base_tables": [
-                "stok_bakiye",
-                "stok_kart",
-                "depo"
-            ],
-            "columns": [
-                {
-                    "name": "depo_id",
-                    "source": "depo.id"
-                },
-                {
-                    "name": "depo_adi",
-                    "source": "depo.depo_adi"
-                },
-                {
-                    "name": "stok_id",
-                    "source": "stok_kart.id"
-                },
-                {
-                    "name": "stok_kodu",
-                    "source": "stok_kart.stok_kodu"
-                },
-                {
-                    "name": "stok_adi",
-                    "source": "stok_kart.stok_adi"
-                },
-                {
-                    "name": "miktar",
-                    "source": "stok_bakiye.miktar"
-                },
-                {
-                    "name": "rezerve",
-                    "source": "stok_bakiye.rezerve_miktar"
-                },
-                {
-                    "name": "deger",
-                    "computed": "miktar * birim_maliyet"
-                }
-            ]
-        },
-        {
-            "name": "stok_kritik_seviye",
-            "description": "Minimum stok seviyesi altındaki ürünler",
-            "base_tables": [
-                "stok_kart",
-                "stok_bakiye"
-            ],
-            "columns": [
-                {
-                    "name": "stok_id",
-                    "source": "stok_kart.id"
-                },
-                {
-                    "name": "stok_kodu",
-                    "source": "stok_kart.stok_kodu"
-                },
-                {
-                    "name": "stok_adi",
-                    "source": "stok_kart.stok_adi"
-                },
-                {
-                    "name": "mevcut_miktar",
-                    "source": "stok_bakiye.miktar"
-                },
-                {
-                    "name": "min_stok",
-                    "source": "stok_kart.min_stok"
-                },
-                {
-                    "name": "eksik_miktar",
-                    "computed": "min_stok - mevcut_miktar"
-                },
-                {
-                    "name": "siparis_miktar",
-                    "source": "stok_kart.siparis_miktari"
-                }
-            ]
-        },
-        {
-            "name": "stok_hareket_ozet",
-            "description": "Dönemsel stok hareket özeti",
-            "base_tables": [
-                "stok_hareket",
-                "stok_kart"
-            ],
-            "columns": [
-                {
-                    "name": "stok_id",
-                    "source": "stok_kart.id"
-                },
-                {
-                    "name": "donem",
-                    "computed": "Yıl-Ay"
-                },
-                {
-                    "name": "giris_miktar",
-                    "aggregation": "SUM(giris)"
-                },
-                {
-                    "name": "cikis_miktar",
-                    "aggregation": "SUM(cikis)"
-                },
-                {
-                    "name": "giris_tutar",
-                    "aggregation": "SUM(giris_tutar)"
-                },
-                {
-                    "name": "cikis_tutar",
-                    "aggregation": "SUM(cikis_tutar)"
-                }
-            ]
-        },
-        {
-            "name": "stok_son_kullanma_yaklaşan",
-            "description": "Son kullanma tarihi yaklaşan ürünler",
-            "base_tables": [
-                "stok_bakiye",
-                "stok_kart",
-                "stok_lot"
-            ],
-            "columns": [
-                {
-                    "name": "stok_id",
-                    "source": "stok_kart.id"
-                },
-                {
-                    "name": "stok_adi",
-                    "source": "stok_kart.stok_adi"
-                },
-                {
-                    "name": "lot_no",
-                    "source": "stok_lot.lot_no"
-                },
-                {
-                    "name": "son_kullanma",
-                    "source": "stok_lot.son_kullanma_tarihi"
-                },
-                {
-                    "name": "kalan_gun",
-                    "computed": "son_kullanma - BUGUN"
-                },
-                {
-                    "name": "miktar",
-                    "source": "stok_bakiye.miktar"
-                }
-            ]
-        },
-        {
-            "name": "stok_deger_raporu",
-            "description": "Stok değeri analizi",
-            "base_tables": [
-                "stok_kart",
-                "stok_bakiye"
-            ],
-            "columns": [
-                {
-                    "name": "kategori",
-                    "source": "stok_kategori.kategori_adi"
-                },
-                {
-                    "name": "toplam_adet",
-                    "aggregation": "SUM(miktar)"
-                },
-                {
-                    "name": "toplam_deger",
-                    "aggregation": "SUM(miktar * birim_maliyet)"
-                },
-                {
-                    "name": "ortalama_birim_maliyet",
-                    "aggregation": "AVG(birim_maliyet)"
-                }
-            ]
-        }
-    ],
-    "business_rules": [
-        {
-            "code": "ST001",
-            "type": "validation",
-            "description": "Stok kodu benzersiz olmalı"
-        },
-        {
-            "code": "ST002",
-            "type": "validation",
-            "description": "Barkod benzersiz olmalı"
-        },
-        {
-            "code": "ST003",
-            "type": "warning",
-            "description": "Minimum stok seviyesi altına düşünce uyarı"
-        },
-        {
-            "code": "ST004",
-            "type": "validation",
-            "description": "Negatif stok izni yoksa stok altına düşemez"
-        },
-        {
-            "code": "ST005",
-            "type": "warning",
-            "description": "Lot takipli ürünlerde lot numarası zorunlu"
-        },
-        {
-            "code": "ST006",
-            "type": "warning",
-            "description": "Son kullanma tarihi yaklaşan ürünler için uyarı"
-        },
-        {
-            "code": "ST007",
-            "type": "validation",
-            "description": "Transfer'de kaynak ve hedef depo farklı olmalı"
         }
     ]
 }
